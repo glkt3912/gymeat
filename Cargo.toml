@@ -1,0 +1,31 @@
+[package]
+name = "gymeat"
+version = "0.1.0"
+edition = "2021"
+description = "筋トレ用食事メニュー生成CLI (gym + eat)"
+license = "MIT"
+
+[dependencies]
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+# シリアライゼーション
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# ランダム選択
+rand = "0.8"
+
+# 出力装飾
+colored = "2.1"
+atty = "0.2"
+
+# 日付処理
+chrono = "0.4"
+
+# エラーハンドリング
+thiserror = "1.0"
+
+[dev-dependencies]
+assert_cmd = "2.0"
+predicates = "3.0"
