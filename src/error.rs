@@ -35,6 +35,9 @@ pub enum MealPlannerError {
 
     #[error("IO エラー: {0}")]
     IoError(#[from] std::io::Error),
+
+    #[error("無効な日付形式です: {0} (YYYY-MM-DD形式で指定してください)")]
+    InvalidDate(String),
 }
 
 /// Resultのエイリアス型
