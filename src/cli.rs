@@ -19,7 +19,13 @@ use clap::{Parser, ValueEnum};
   gymeat --goal cut --calories 1800
 
   # レシピ付きで表示
-  gymeat --recipe --verbose"
+  gymeat --recipe --verbose
+
+  # 週間プラン生成 (今日から7日間)
+  gymeat --weekly --goal bulk
+
+  # 週間プラン生成 (指定日から7日間)
+  gymeat --weekly --start-date 2026-01-13 --goal cut"
 )]
 pub struct CliArgs {
     /// トレーニング目的: bulk (増量), cut (減量), maintain (維持)
@@ -61,6 +67,14 @@ pub struct CliArgs {
     /// 詳細情報を表示
     #[arg(short, long)]
     pub verbose: bool,
+
+    /// 7日間の週間プランを生成
+    #[arg(long)]
+    pub weekly: bool,
+
+    /// 週間プラン開始日 (YYYY-MM-DD形式, デフォルト: 今日)
+    #[arg(long, requires = "weekly")]
+    pub start_date: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
