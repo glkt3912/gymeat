@@ -1,5 +1,5 @@
 use crate::data::MealDatabase;
-use crate::models::{DailyPlan, Goal, Meal, MealType, Nutrition};
+use crate::models::{DailyPlan, WeeklyPlan, Goal, Meal, MealType, Nutrition};
 use colored::*;
 
 /// ターミナル出力
@@ -215,5 +215,127 @@ impl TerminalOutput {
         } else {
             pct_str.yellow().to_string()
         }
+    }
+
+    fn colorize_day_header(&self, text: &str) -> String {
+        if self.enable_color {
+            text.bright_cyan().bold().to_string()
+        } else {
+            text.to_string()
+        }
+    }
+
+    /// 週間プランを表示
+    pub fn print_weekly_plan(
+        &self,
+        plan: &WeeklyPlan,
+        _database: &MealDatabase,
+        _show_recipe: bool,
+    ) {
+        self.print_weekly_header(&plan.target.goal, &plan.start_date);
+
+        println!("\n{}", "━".repeat(80));
+        self.print_target(&plan.target);
+        println!("{}\n", "━".repeat(80));
+
+        // 各日のプランを表示
+        for (idx, daily_plan) in plan.daily_plans.iter().enumerate() {
+            let day_label = format!("Day {} ({})", idx + 1, daily_plan.date.as_ref().unwrap());
+            println!("\n{}", self.colorize_day_header(&day_label));
+            println!("{}", "─".repeat(80));
+
+            self.print_meals_compact(&daily_plan.meals);
+            self.print_daily_summary(&daily_plan.total_nutrition, &daily_plan.target);
+
+            if idx < plan.daily_plans.len() - 1 {
+                println!("\n{}", "━".repeat(80));
+            }
+        }
+
+        // 週間サマリー
+        println!("\n{}", "━".repeat(80));
+        self.print_weekly_summary(plan);
+    }
+
+    fn print_weekly_header(&self, goal: &Goal, start_date: &str) {
+        let title = match goal {
+            Goal::Bulk => "7日間食事プラン (増量モード)",
+            Goal::Cut => "7日間食事プラン (減量モード)",
+            Goal::Maintain => "7日間食事プラン (維持モード)",
+        };
+
+        println!("\n{}", "━".repeat(80));
+        println!("     {}", self.colorize_title(title));
+        println!("     開始日: {}", start_date);
+        println!("{}", "━".repeat(80));
+    }
+
+    /// コンパクトな食事表示 (週間ビュー用)
+    fn print_meals_compact(&self, meals: &[Meal]) {
+        for meal in meals {
+            let meal_type_label = match meal.meal_type {
+                MealType::Breakfast => "朝",
+                MealType::Lunch => "昼",
+                MealType::Dinner => "夕",
+                MealType::Snack => "間",
+            };
+
+            println!(
+                "  [{}] {} ({} kcal | P:{}g F:{}g C:{}g)",
+                self.colorize_label(meal_type_label),
+                self.colorize_meal_name(&meal.name),
+                format!("{:.0}", meal.nutrition.calories),
+                format!("{:.0}", meal.nutrition.protein),
+                format!("{:.0}", meal.nutrition.fat),
+                format!("{:.0}", meal.nutrition.carbohydrates),
+            );
+        }
+    }
+
+    /// 日次サマリー (簡易版)
+    fn print_daily_summary(&self, actual: &Nutrition, target: &crate::models::MacroTarget) {
+        let cal_pct = (actual.calories / target.daily_calories) * 100.0;
+        println!(
+            "  合計: {} kcal ({}%)",
+            self.colorize_value(&format!("{:.0}", actual.calories)),
+            self.colorize_percentage(cal_pct),
+        );
+    }
+
+    /// 週間サマリー
+    fn print_weekly_summary(&self, plan: &WeeklyPlan) {
+        println!("\n週間統計:");
+
+        let avg = plan.average_nutrition();
+        let total = plan.total_nutrition();
+
+        println!("  1日平均:");
+        println!(
+            "    カロリー: {} kcal",
+            self.colorize_value(&format!("{:.0}", avg.calories))
+        );
+        println!(
+            "    タンパク質: {} g",
+            self.colorize_value(&format!("{:.0}", avg.protein))
+        );
+        println!(
+            "    脂質: {} g",
+            self.colorize_value(&format!("{:.0}", avg.fat))
+        );
+        println!(
+            "    炭水化物: {} g",
+            self.colorize_value(&format!("{:.0}", avg.carbohydrates))
+        );
+
+        println!("\n  週間合計:");
+        println!(
+            "    カロリー: {} kcal",
+            self.colorize_value(&format!("{:.0}", total.calories))
+        );
+
+        // 目標達成率
+        let target_weekly_cal = plan.target.daily_calories * 7.0;
+        let cal_pct = (total.calories / target_weekly_cal) * 100.0;
+        println!("    目標達成率: {}%", self.colorize_percentage(cal_pct));
     }
 }
