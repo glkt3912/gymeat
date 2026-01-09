@@ -1,7 +1,14 @@
+use chrono::NaiveDate;
 use clap::Parser;
 use gymeat::{
-    cli::CliArgs, config::PlanConfig, data::MealDatabase, models::MealType,
-    output::TerminalOutput, planner::DailyPlanner, Result,
+    cli::CliArgs,
+    config::PlanConfig,
+    data::MealDatabase,
+    error::MealPlannerError,
+    models::MealType,
+    output::TerminalOutput,
+    planner::{DailyPlanner, WeeklyPlanner},
+    Result,
 };
 
 fn main() -> Result<()> {
@@ -41,14 +48,32 @@ fn main() -> Result<()> {
         println!();
     }
 
-    // プランナーを作成して1日プランを生成
-    let planner = DailyPlanner::new(&database, &config);
-    let plan = planner.generate()?;
-
-    // 出力
+    // 出力設定
     let enable_color = !args.no_color && atty::is(atty::Stream::Stdout);
     let output = TerminalOutput::new(enable_color);
-    output.print_daily_plan(&plan, &database, args.recipe);
+
+    // 週間プランまたは日次プラン
+    if args.weekly {
+        // 開始日のパース
+        let start_date = if let Some(date_str) = args.start_date {
+            Some(
+                NaiveDate::parse_from_str(&date_str, "%Y-%m-%d")
+                    .map_err(|_| MealPlannerError::InvalidDate(date_str))?,
+            )
+        } else {
+            None
+        };
+
+        // 週間プラン生成
+        let planner = WeeklyPlanner::new(&database, &config);
+        let plan = planner.generate(start_date)?;
+        output.print_weekly_plan(&plan, &database, args.recipe);
+    } else {
+        // 日次プラン生成
+        let planner = DailyPlanner::new(&database, &config);
+        let plan = planner.generate()?;
+        output.print_daily_plan(&plan, &database, args.recipe);
+    }
 
     println!(); // 最後に改行
 

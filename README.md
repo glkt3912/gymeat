@@ -7,6 +7,7 @@ gym + eat = gymeat 🏋️💪
 ## 特徴
 
 - **目的別メニュー**: 増量(Bulk)、減量(Cut)、維持(Maintain)の3つのモードに対応
+- **週間プラン生成**: 7日分のメニューを一度に生成、メニューの重複を自動回避
 - **精密なカロリー計算**: Harris-Benedict式を使用したBMR/TDEE計算
 - **性別対応**: 男性・女性それぞれに最適化されたカロリー計算
 - **24種類の筋トレ向けメニュー**: 高タンパクで栄養バランスの取れた実際の料理
@@ -48,6 +49,31 @@ gymeat --goal maintain --weight 55 --height 160 --age 28 --gender female --activ
 
 # レシピを表示
 gymeat --goal bulk --calories 2800 --recipe
+
+# 週間プラン生成（今日から7日間）
+gymeat --weekly --goal bulk
+
+# 週間プラン生成（指定日から7日間）
+gymeat --weekly --start-date 2026-01-13 --goal cut
+```
+
+### 週間プラン
+
+週間プランを生成すると、7日分のメニューが一度に表示されます。メニューの重複は自動的に回避されます（データベースの容量に応じて）。
+
+```bash
+# 今日から7日間の増量プランを生成
+gymeat --weekly --goal bulk --weight 70 --height 175 --age 25 --gender male
+
+# 特定の日から開始
+gymeat --weekly --start-date 2026-02-01 --goal cut --calories 2000
+```
+
+**週間プランの特徴:**
+- 7日分のメニューを一括生成
+- 同じメニューが週内で重複しないよう自動調整
+- 1日平均と週間合計の栄養統計を表示
+- 開始日を指定可能（デフォルトは今日）
 ```
 
 ### オプション
@@ -84,6 +110,13 @@ Options:
 
   -v, --verbose
           詳細情報を表示
+
+      --weekly
+          7日間の週間プランを生成
+
+      --start-date <START_DATE>
+          週間プラン開始日 (YYYY-MM-DD形式, デフォルト: 今日)
+          ※--weeklyと併用
 
   -h, --help
           ヘルプを表示
@@ -198,7 +231,7 @@ gymeat/
 
 ## 今後の拡張予定
 
-- [ ] 週間プラン生成
+- [x] 週間プラン生成
 - [ ] 月間プラン生成
 - [ ] JSON/CSV出力
 - [ ] 除外食材フィルタ
