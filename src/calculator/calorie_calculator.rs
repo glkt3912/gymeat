@@ -50,9 +50,9 @@ impl CalorieCalculator {
     /// カロリー目標 (kcal/日)
     pub fn calculate_target_calories(tdee: f32, goal: Goal) -> f32 {
         match goal {
-            Goal::Bulk => tdee + 300.0,     // 増量: +300kcal
-            Goal::Cut => tdee - 500.0,      // 減量: -500kcal
-            Goal::Maintain => tdee,         // 維持: そのまま
+            Goal::Bulk => tdee + 300.0, // 増量: +300kcal
+            Goal::Cut => tdee - 500.0,  // 減量: -500kcal
+            Goal::Maintain => tdee,     // 維持: そのまま
         }
     }
 }

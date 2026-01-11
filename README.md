@@ -15,6 +15,7 @@ gym + eat = gymeat 🏋️💪
 - **レシピ表示**: 調理手順も確認可能
 - **カラフルな出力**: 見やすいターミナル表示
 - **初心者にも優しい**: 初回実行時のガイダンス、詳細なエラーメッセージ、達成度評価とアドバイス
+- **多様な出力形式**: JSON、CSV、Markdown、PDF形式での出力に対応（データ分析や印刷に便利）
 
 ## インストール
 
@@ -55,6 +56,49 @@ gymeat --weekly --goal bulk
 
 # 週間プラン生成（指定日から7日間）
 gymeat --weekly --start-date 2026-01-13 --goal cut
+
+# JSON形式で出力
+gymeat --output json-pretty --output-file plan.json
+
+# CSV形式で週間プランを出力
+gymeat --weekly --output csv --output-file weekly.csv
+
+# Markdown形式で出力（レシピ付き）
+gymeat --recipe --output markdown --output-file plan.md
+
+# PDF形式で出力（印刷用、要pandoc）
+gymeat --output pdf --output-file plan.pdf
+```
+
+### 出力フォーマット
+
+プランを様々な形式で出力できます:
+
+**JSON形式** - APIやデータ分析に最適
+```bash
+# 標準出力にJSON出力
+gymeat --output json
+
+# ファイルに整形済みJSON出力
+gymeat --output json-pretty --output-file plan.json
+```
+
+**CSV形式** - スプレッドシートで編集・分析
+```bash
+gymeat --weekly --output csv --output-file weekly.csv
+# ExcelやGoogleスプレッドシートで開ける
+```
+
+**Markdown形式** - ドキュメント作成や共有に便利
+```bash
+gymeat --recipe --output markdown --output-file plan.md
+# GitHubやNotionなどで美しく表示
+```
+
+**PDF形式** - 印刷やレポート作成に
+```bash
+gymeat --weekly --output pdf --output-file weekly_plan.pdf
+# 要pandocインストール: brew install pandoc basictex
 ```
 
 ### 週間プラン
@@ -117,6 +161,13 @@ Options:
       --start-date <START_DATE>
           週間プラン開始日 (YYYY-MM-DD形式, デフォルト: 今日)
           ※--weeklyと併用
+
+  -o, --output <FORMAT>
+          出力フォーマット [default: terminal]
+          [possible values: terminal, json, json-pretty, csv, markdown, pdf]
+
+      --output-file <PATH>
+          出力先ファイルパス (指定しない場合は標準出力、PDF出力時は必須)
 
   -h, --help
           ヘルプを表示
@@ -232,8 +283,8 @@ gymeat/
 ## 今後の拡張予定
 
 - [x] 週間プラン生成
+- [x] JSON/CSV/Markdown/PDF出力
 - [ ] 月間プラン生成
-- [ ] JSON/CSV出力
 - [ ] 除外食材フィルタ
 - [ ] 外部ファイルからのカスタムメニュー読み込み
 - [ ] 履歴管理機能

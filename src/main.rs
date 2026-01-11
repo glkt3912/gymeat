@@ -1,15 +1,19 @@
 use chrono::NaiveDate;
 use clap::Parser;
 use gymeat::{
-    cli::CliArgs,
+    cli::{CliArgs, OutputFormatArg},
     config::PlanConfig,
     data::MealDatabase,
     error::MealPlannerError,
     models::MealType,
-    output::TerminalOutput,
+    output::{
+        write_daily_plan_to_pdf, write_output, write_weekly_plan_to_pdf, CsvFormatter,
+        JsonFormatter, MarkdownFormatter, OutputDestination, OutputFormatter, TerminalOutput,
+    },
     planner::{DailyPlanner, WeeklyPlanner},
     Result,
 };
+use std::path::PathBuf;
 
 fn main() -> Result<()> {
     // CLI引数をパース
@@ -23,7 +27,10 @@ fn main() -> Result<()> {
         eprintln!("💡 ヒント: より正確なカロリー計算のために体組成情報を指定できます");
         eprintln!("   例: gymeat --goal bulk --weight 70 --height 175 --age 25 --gender male");
         eprintln!();
-        eprintln!("   デフォルトカロリーで生成します ({}kcal)...", config.default_calories());
+        eprintln!(
+            "   デフォルトカロリーで生成します ({}kcal)...",
+            config.default_calories()
+        );
         eprintln!();
     }
 
@@ -40,17 +47,35 @@ fn main() -> Result<()> {
     let database = MealDatabase::new_embedded()?;
 
     if args.verbose {
-        println!("✅ メニューデータベース読み込み完了: {} 種類", database.count());
-        println!("   - 朝食: {} 種類", database.count_by_type(MealType::Breakfast));
-        println!("   - 昼食: {} 種類", database.count_by_type(MealType::Lunch));
-        println!("   - 夕食: {} 種類", database.count_by_type(MealType::Dinner));
-        println!("   - 間食: {} 種類", database.count_by_type(MealType::Snack));
+        println!(
+            "✅ メニューデータベース読み込み完了: {} 種類",
+            database.count()
+        );
+        println!(
+            "   - 朝食: {} 種類",
+            database.count_by_type(MealType::Breakfast)
+        );
+        println!(
+            "   - 昼食: {} 種類",
+            database.count_by_type(MealType::Lunch)
+        );
+        println!(
+            "   - 夕食: {} 種類",
+            database.count_by_type(MealType::Dinner)
+        );
+        println!(
+            "   - 間食: {} 種類",
+            database.count_by_type(MealType::Snack)
+        );
         println!();
     }
 
-    // 出力設定
-    let enable_color = !args.no_color && atty::is(atty::Stream::Stdout);
-    let output = TerminalOutput::new(enable_color);
+    // 出力先の決定
+    let destination = if let Some(path) = &args.output_file {
+        OutputDestination::File(PathBuf::from(path))
+    } else {
+        OutputDestination::Stdout
+    };
 
     // 週間プランまたは日次プラン
     if args.weekly {
@@ -67,15 +92,123 @@ fn main() -> Result<()> {
         // 週間プラン生成
         let planner = WeeklyPlanner::new(&database, &config);
         let plan = planner.generate(start_date)?;
-        output.print_weekly_plan(&plan, &database, args.recipe);
+
+        // フォーマット別出力
+        match args.output {
+            OutputFormatArg::Terminal => {
+                let enable_color = !args.no_color && atty::is(atty::Stream::Stdout);
+                let output = TerminalOutput::new(enable_color);
+                output.print_weekly_plan(&plan, &database, args.recipe);
+                println!(); // 最後に改行
+            }
+            OutputFormatArg::Json => {
+                let formatter = JsonFormatter::new(false);
+                let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::JsonPretty => {
+                let formatter = JsonFormatter::new(true);
+                let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::Csv => {
+                let formatter = CsvFormatter::new();
+                let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ CSV出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::Markdown => {
+                let formatter = MarkdownFormatter::new();
+                let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!(
+                        "✅ Markdown出力が完了しました: {}",
+                        args.output_file.unwrap()
+                    );
+                }
+            }
+            OutputFormatArg::Pdf => {
+                if let Some(path_str) = &args.output_file {
+                    let path = PathBuf::from(path_str);
+                    write_weekly_plan_to_pdf(&plan, &database, args.recipe, &path)?;
+                    println!("✅ PDF出力が完了しました: {}", path_str);
+                } else {
+                    return Err(MealPlannerError::OutputError(
+                        "PDF出力には--output-fileオプションが必要です".to_string(),
+                    ));
+                }
+            }
+        }
     } else {
         // 日次プラン生成
         let planner = DailyPlanner::new(&database, &config);
         let plan = planner.generate()?;
-        output.print_daily_plan(&plan, &database, args.recipe);
-    }
 
-    println!(); // 最後に改行
+        // フォーマット別出力
+        match args.output {
+            OutputFormatArg::Terminal => {
+                let enable_color = !args.no_color && atty::is(atty::Stream::Stdout);
+                let output = TerminalOutput::new(enable_color);
+                output.print_daily_plan(&plan, &database, args.recipe);
+                println!(); // 最後に改行
+            }
+            OutputFormatArg::Json => {
+                let formatter = JsonFormatter::new(false);
+                let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::JsonPretty => {
+                let formatter = JsonFormatter::new(true);
+                let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::Csv => {
+                let formatter = CsvFormatter::new();
+                let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ CSV出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::Markdown => {
+                let formatter = MarkdownFormatter::new();
+                let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!(
+                        "✅ Markdown出力が完了しました: {}",
+                        args.output_file.unwrap()
+                    );
+                }
+            }
+            OutputFormatArg::Pdf => {
+                if let Some(path_str) = &args.output_file {
+                    let path = PathBuf::from(path_str);
+                    write_daily_plan_to_pdf(&plan, &database, args.recipe, &path)?;
+                    println!("✅ PDF出力が完了しました: {}", path_str);
+                } else {
+                    return Err(MealPlannerError::OutputError(
+                        "PDF出力には--output-fileオプションが必要です".to_string(),
+                    ));
+                }
+            }
+        }
+    }
 
     Ok(())
 }

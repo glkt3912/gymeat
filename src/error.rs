@@ -33,6 +33,15 @@ pub enum MealPlannerError {
     #[error("出力エラー: {0}")]
     OutputError(String),
 
+    #[error("ファイル書き込みエラー: {0}")]
+    FileWriteError(String),
+
+    #[error("フォーマット変換エラー: {0}")]
+    FormatError(String),
+
+    #[error("PDF生成エラー: {0}\n💡 ヒント: pandocとTeX環境がインストールされているか確認してください\nインストール方法:\n  macOS: brew install pandoc basictex\n  Ubuntu: apt-get install pandoc texlive-xetex\n  Windows: https://pandoc.org/installing.html")]
+    PdfGenerationError(String),
+
     #[error("IO エラー: {0}")]
     IoError(#[from] std::io::Error),
 

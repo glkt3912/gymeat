@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Recipe {
     pub meal_id: String,
-    pub steps: Vec<String>,  // 調理手順
+    pub steps: Vec<String>, // 調理手順
 }
 
 impl Recipe {

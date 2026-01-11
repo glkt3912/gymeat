@@ -3,10 +3,10 @@ use serde::{Deserialize, Serialize};
 /// 栄養情報
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct Nutrition {
-    pub calories: f32,       // kcal
-    pub protein: f32,        // g
-    pub fat: f32,            // g
-    pub carbohydrates: f32,  // g
+    pub calories: f32,      // kcal
+    pub protein: f32,       // g
+    pub fat: f32,           // g
+    pub carbohydrates: f32, // g
 }
 
 impl Nutrition {
