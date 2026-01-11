@@ -9,7 +9,7 @@ pub use nutrition::Nutrition;
 pub use recipe::Recipe;
 
 /// 1日の食事プラン
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct DailyPlan {
     pub date: Option<String>,
     pub meals: Vec<Meal>,           // 朝昼夕+間食の4食
@@ -34,7 +34,7 @@ impl DailyPlan {
 }
 
 /// 7日間の食事プラン
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct WeeklyPlan {
     pub start_date: String,          // 開始日 (YYYY-MM-DD)
     pub daily_plans: Vec<DailyPlan>, // 7日分のDailyPlan

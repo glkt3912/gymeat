@@ -9,7 +9,7 @@ pub enum Goal {
 }
 
 /// マクロ栄養素の目標値
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MacroTarget {
     pub goal: Goal,
     pub daily_calories: f32,
