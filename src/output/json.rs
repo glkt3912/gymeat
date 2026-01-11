@@ -1,7 +1,7 @@
 use super::formatter::OutputFormatter;
 use crate::data::MealDatabase;
 use crate::error::{MealPlannerError, Result};
-use crate::models::{DailyPlan, Meal, WeeklyPlan};
+use crate::models::{DailyPlan, Meal, MonthlyPlan, WeeklyPlan};
 use serde::Serialize;
 
 /// JSON出力フォーマッター
@@ -41,6 +41,23 @@ impl OutputFormatter for JsonFormatter {
         show_recipe: bool,
     ) -> Result<String> {
         let serializable = SerializableWeeklyPlan::from_plan(plan, database, show_recipe);
+
+        let json = if self.pretty {
+            serde_json::to_string_pretty(&serializable)
+        } else {
+            serde_json::to_string(&serializable)
+        };
+
+        json.map_err(|e| MealPlannerError::FormatError(format!("JSON変換失敗: {}", e)))
+    }
+
+    fn format_monthly_plan(
+        &self,
+        plan: &MonthlyPlan,
+        database: &MealDatabase,
+        show_recipe: bool,
+    ) -> Result<String> {
+        let serializable = SerializableMonthlyPlan::from_plan(plan, database, show_recipe);
 
         let json = if self.pretty {
             serde_json::to_string_pretty(&serializable)
@@ -109,6 +126,34 @@ impl SerializableWeeklyPlan {
             daily_plans,
             target: plan.target.clone(),
             weekly_total: plan.total_nutrition(),
+            daily_average: plan.average_nutrition(),
+        }
+    }
+}
+
+/// シリアライズ可能な月間プラン
+#[derive(Serialize)]
+struct SerializableMonthlyPlan {
+    start_date: String,
+    daily_plans: Vec<SerializableDailyPlan>,
+    target: crate::models::MacroTarget,
+    monthly_total: crate::models::Nutrition,
+    daily_average: crate::models::Nutrition,
+}
+
+impl SerializableMonthlyPlan {
+    fn from_plan(plan: &MonthlyPlan, database: &MealDatabase, show_recipe: bool) -> Self {
+        let daily_plans = plan
+            .daily_plans
+            .iter()
+            .map(|p| SerializableDailyPlan::from_plan(p, database, show_recipe))
+            .collect();
+
+        Self {
+            start_date: plan.start_date.clone(),
+            daily_plans,
+            target: plan.target.clone(),
+            monthly_total: plan.total_nutrition(),
             daily_average: plan.average_nutrition(),
         }
     }
