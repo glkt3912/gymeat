@@ -25,7 +25,16 @@ use clap::{Parser, ValueEnum};
   gymeat --weekly --goal bulk
 
   # 週間プラン生成 (指定日から7日間)
-  gymeat --weekly --start-date 2026-01-13 --goal cut"
+  gymeat --weekly --start-date 2026-01-13 --goal cut
+
+  # JSON形式で出力
+  gymeat --output json --output-file plan.json
+
+  # CSV形式で週間プラン出力
+  gymeat --weekly --output csv --output-file weekly.csv
+
+  # PDF形式で出力 (要pandoc)
+  gymeat --output pdf --output-file plan.pdf"
 )]
 pub struct CliArgs {
     /// トレーニング目的: bulk (増量), cut (減量), maintain (維持)
@@ -75,6 +84,14 @@ pub struct CliArgs {
     /// 週間プラン開始日 (YYYY-MM-DD形式, デフォルト: 今日)
     #[arg(long, requires = "weekly")]
     pub start_date: Option<String>,
+
+    /// 出力フォーマット: terminal (ターミナル), json, json-pretty, csv, markdown, pdf
+    #[arg(short = 'o', long, default_value = "terminal")]
+    pub output: OutputFormatArg,
+
+    /// 出力先ファイルパス (指定しない場合は標準出力、PDF出力時は必須)
+    #[arg(long)]
+    pub output_file: Option<String>,
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
@@ -108,6 +125,23 @@ pub enum ActivityArg {
     /// 1日2回以上
     #[value(name = "very-active")]
     VeryActive,
+}
+
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum OutputFormatArg {
+    /// ターミナル出力 (デフォルト)
+    Terminal,
+    /// JSON形式
+    Json,
+    /// JSON形式 (整形済み)
+    #[value(name = "json-pretty")]
+    JsonPretty,
+    /// CSV形式
+    Csv,
+    /// Markdown形式
+    Markdown,
+    /// PDF形式 (要pandoc)
+    Pdf,
 }
 
 impl From<GoalArg> for crate::models::Goal {
