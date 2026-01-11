@@ -80,6 +80,54 @@ impl WeeklyPlan {
     }
 }
 
+/// 30日間の食事プラン
+#[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
+pub struct MonthlyPlan {
+    pub start_date: String,          // 開始日 (YYYY-MM-DD)
+    pub daily_plans: Vec<DailyPlan>, // 30日分のDailyPlan
+    pub target: MacroTarget,         // 共通の目標値
+}
+
+impl MonthlyPlan {
+    pub fn new(start_date: String, daily_plans: Vec<DailyPlan>, target: MacroTarget) -> Self {
+        Self {
+            start_date,
+            daily_plans,
+            target,
+        }
+    }
+
+    /// 月間平均栄養を計算
+    pub fn average_nutrition(&self) -> Nutrition {
+        let days = self.daily_plans.len() as f32;
+        let total = Nutrition::sum(
+            &self
+                .daily_plans
+                .iter()
+                .map(|p| &p.total_nutrition)
+                .collect::<Vec<_>>(),
+        );
+
+        Nutrition {
+            calories: total.calories / days,
+            protein: total.protein / days,
+            fat: total.fat / days,
+            carbohydrates: total.carbohydrates / days,
+        }
+    }
+
+    /// 月間合計栄養を計算
+    pub fn total_nutrition(&self) -> Nutrition {
+        Nutrition::sum(
+            &self
+                .daily_plans
+                .iter()
+                .map(|p| &p.total_nutrition)
+                .collect::<Vec<_>>(),
+        )
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
