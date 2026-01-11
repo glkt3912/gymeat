@@ -2,7 +2,7 @@ use crate::calculator::{CalorieCalculator, MacroCalculator};
 use crate::config::PlanConfig;
 use crate::data::MealDatabase;
 use crate::error::{MealPlannerError, Result};
-use crate::models::{DailyPlan, Meal, MealType, MacroTarget, Nutrition};
+use crate::models::{DailyPlan, MacroTarget, Meal, MealType, Nutrition};
 use rand::seq::SliceRandom;
 
 /// 1日プランナー
@@ -32,7 +32,8 @@ impl<'a> DailyPlanner<'a> {
         let meals = vec![breakfast, lunch, dinner, snack];
 
         // 3. 合計栄養を計算
-        let total_nutrition = Nutrition::sum(&meals.iter().map(|m| &m.nutrition).collect::<Vec<_>>());
+        let total_nutrition =
+            Nutrition::sum(&meals.iter().map(|m| &m.nutrition).collect::<Vec<_>>());
 
         // 4. 日付を取得
         let date = Some(chrono::Local::now().format("%Y-%m-%d").to_string());
@@ -45,9 +46,12 @@ impl<'a> DailyPlanner<'a> {
         let calories = if let Some(custom) = self.config.custom_calories {
             // カスタムカロリーが指定されている場合
             custom
-        } else if let (Some(w), Some(h), Some(a), Some(g)) =
-            (self.config.weight, self.config.height, self.config.age, self.config.gender)
-        {
+        } else if let (Some(w), Some(h), Some(a), Some(g)) = (
+            self.config.weight,
+            self.config.height,
+            self.config.age,
+            self.config.gender,
+        ) {
             // 体組成情報からBMR/TDEEを計算
             let bmr = CalorieCalculator::calculate_bmr(w, h, a, g);
             let tdee = CalorieCalculator::calculate_tdee(bmr, self.config.activity_level);
@@ -57,7 +61,10 @@ impl<'a> DailyPlanner<'a> {
             self.config.default_calories()
         };
 
-        Ok(MacroCalculator::calculate_macros(calories, self.config.goal))
+        Ok(MacroCalculator::calculate_macros(
+            calories,
+            self.config.goal,
+        ))
     }
 
     /// 指定した食事タイプのメニューを選択
@@ -80,7 +87,9 @@ impl<'a> DailyPlanner<'a> {
                 MealType::Dinner => "夕食",
                 MealType::Snack => "間食",
             };
-            return Err(MealPlannerError::NoSuitableMealFound(meal_type_str.to_string()));
+            return Err(MealPlannerError::NoSuitableMealFound(
+                meal_type_str.to_string(),
+            ));
         }
 
         // 目標に近い順にソート

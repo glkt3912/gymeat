@@ -27,7 +27,10 @@ fn main() -> Result<()> {
         eprintln!("💡 ヒント: より正確なカロリー計算のために体組成情報を指定できます");
         eprintln!("   例: gymeat --goal bulk --weight 70 --height 175 --age 25 --gender male");
         eprintln!();
-        eprintln!("   デフォルトカロリーで生成します ({}kcal)...", config.default_calories());
+        eprintln!(
+            "   デフォルトカロリーで生成します ({}kcal)...",
+            config.default_calories()
+        );
         eprintln!();
     }
 
@@ -44,11 +47,26 @@ fn main() -> Result<()> {
     let database = MealDatabase::new_embedded()?;
 
     if args.verbose {
-        println!("✅ メニューデータベース読み込み完了: {} 種類", database.count());
-        println!("   - 朝食: {} 種類", database.count_by_type(MealType::Breakfast));
-        println!("   - 昼食: {} 種類", database.count_by_type(MealType::Lunch));
-        println!("   - 夕食: {} 種類", database.count_by_type(MealType::Dinner));
-        println!("   - 間食: {} 種類", database.count_by_type(MealType::Snack));
+        println!(
+            "✅ メニューデータベース読み込み完了: {} 種類",
+            database.count()
+        );
+        println!(
+            "   - 朝食: {} 種類",
+            database.count_by_type(MealType::Breakfast)
+        );
+        println!(
+            "   - 昼食: {} 種類",
+            database.count_by_type(MealType::Lunch)
+        );
+        println!(
+            "   - 夕食: {} 種類",
+            database.count_by_type(MealType::Dinner)
+        );
+        println!(
+            "   - 間食: {} 種類",
+            database.count_by_type(MealType::Snack)
+        );
         println!();
     }
 
@@ -112,7 +130,10 @@ fn main() -> Result<()> {
                 let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
                 if args.output_file.is_some() {
-                    println!("✅ Markdown出力が完了しました: {}", args.output_file.unwrap());
+                    println!(
+                        "✅ Markdown出力が完了しました: {}",
+                        args.output_file.unwrap()
+                    );
                 }
             }
             OutputFormatArg::Pdf => {
@@ -169,7 +190,10 @@ fn main() -> Result<()> {
                 let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
                 if args.output_file.is_some() {
-                    println!("✅ Markdown出力が完了しました: {}", args.output_file.unwrap());
+                    println!(
+                        "✅ Markdown出力が完了しました: {}",
+                        args.output_file.unwrap()
+                    );
                 }
             }
             OutputFormatArg::Pdf => {

@@ -1,5 +1,5 @@
 use crate::data::MealDatabase;
-use crate::models::{DailyPlan, WeeklyPlan, Goal, Meal, MealType, Nutrition};
+use crate::models::{DailyPlan, Goal, Meal, MealType, Nutrition, WeeklyPlan};
 use colored::*;
 
 /// ターミナル出力
@@ -43,16 +43,25 @@ impl TerminalOutput {
 
     fn print_target(&self, target: &crate::models::MacroTarget) {
         println!("\n目標栄養素:");
-        println!("  カロリー: {} kcal", self.colorize_value(&format!("{:.0}", target.daily_calories)));
-        println!("  タンパク質: {}g ({}%)",
-                 self.colorize_value(&format!("{:.0}", target.protein_grams)),
-                 self.calculate_percentage(target.protein_grams * 4.0, target.daily_calories));
-        println!("  脂質: {}g ({}%)",
-                 self.colorize_value(&format!("{:.0}", target.fat_grams)),
-                 self.calculate_percentage(target.fat_grams * 9.0, target.daily_calories));
-        println!("  炭水化物: {}g ({}%)",
-                 self.colorize_value(&format!("{:.0}", target.carbs_grams)),
-                 self.calculate_percentage(target.carbs_grams * 4.0, target.daily_calories));
+        println!(
+            "  カロリー: {} kcal",
+            self.colorize_value(&format!("{:.0}", target.daily_calories))
+        );
+        println!(
+            "  タンパク質: {}g ({}%)",
+            self.colorize_value(&format!("{:.0}", target.protein_grams)),
+            self.calculate_percentage(target.protein_grams * 4.0, target.daily_calories)
+        );
+        println!(
+            "  脂質: {}g ({}%)",
+            self.colorize_value(&format!("{:.0}", target.fat_grams)),
+            self.calculate_percentage(target.fat_grams * 9.0, target.daily_calories)
+        );
+        println!(
+            "  炭水化物: {}g ({}%)",
+            self.colorize_value(&format!("{:.0}", target.carbs_grams)),
+            self.calculate_percentage(target.carbs_grams * 4.0, target.daily_calories)
+        );
     }
 
     fn print_meals(&self, meals: &[Meal], database: &MealDatabase, show_recipe: bool) {
@@ -64,9 +73,11 @@ impl TerminalOutput {
                 MealType::Snack => "間食",
             };
 
-            println!("\n【{}】{}",
-                     self.colorize_label(meal_type_label),
-                     self.colorize_meal_name(&meal.name));
+            println!(
+                "\n【{}】{}",
+                self.colorize_label(meal_type_label),
+                self.colorize_meal_name(&meal.name)
+            );
             println!("  調理時間: {}分", meal.prep_time);
 
             if !meal.ingredients.is_empty() {
@@ -96,11 +107,13 @@ impl TerminalOutput {
     }
 
     fn print_nutrition(&self, nutrition: &Nutrition) {
-        println!("  \n  栄養: {} kcal | P: {}g | F: {}g | C: {}g",
-                 self.colorize_value(&format!("{:.0}", nutrition.calories)),
-                 self.colorize_value(&format!("{:.0}", nutrition.protein)),
-                 self.colorize_value(&format!("{:.0}", nutrition.fat)),
-                 self.colorize_value(&format!("{:.0}", nutrition.carbohydrates)));
+        println!(
+            "  \n  栄養: {} kcal | P: {}g | F: {}g | C: {}g",
+            self.colorize_value(&format!("{:.0}", nutrition.calories)),
+            self.colorize_value(&format!("{:.0}", nutrition.protein)),
+            self.colorize_value(&format!("{:.0}", nutrition.fat)),
+            self.colorize_value(&format!("{:.0}", nutrition.carbohydrates))
+        );
     }
 
     fn print_summary(&self, actual: &Nutrition, target: &crate::models::MacroTarget) {
@@ -111,21 +124,29 @@ impl TerminalOutput {
         let fat_pct = (actual.fat / target.fat_grams) * 100.0;
         let carb_pct = (actual.carbohydrates / target.carbs_grams) * 100.0;
 
-        println!("  カロリー: {} kcal ({}%)",
-                 self.colorize_value(&format!("{:.0}", actual.calories)),
-                 self.colorize_percentage(cal_pct));
+        println!(
+            "  カロリー: {} kcal ({}%)",
+            self.colorize_value(&format!("{:.0}", actual.calories)),
+            self.colorize_percentage(cal_pct)
+        );
 
-        println!("  タンパク質: {} g ({}%)",
-                 self.colorize_value(&format!("{:.0}", actual.protein)),
-                 self.colorize_percentage(pro_pct));
+        println!(
+            "  タンパク質: {} g ({}%)",
+            self.colorize_value(&format!("{:.0}", actual.protein)),
+            self.colorize_percentage(pro_pct)
+        );
 
-        println!("  脂質: {} g ({}%)",
-                 self.colorize_value(&format!("{:.0}", actual.fat)),
-                 self.colorize_percentage(fat_pct));
+        println!(
+            "  脂質: {} g ({}%)",
+            self.colorize_value(&format!("{:.0}", actual.fat)),
+            self.colorize_percentage(fat_pct)
+        );
 
-        println!("  炭水化物: {} g ({}%)",
-                 self.colorize_value(&format!("{:.0}", actual.carbohydrates)),
-                 self.colorize_percentage(carb_pct));
+        println!(
+            "  炭水化物: {} g ({}%)",
+            self.colorize_value(&format!("{:.0}", actual.carbohydrates)),
+            self.colorize_percentage(carb_pct)
+        );
 
         // アドバイス表示
         self.print_advice(cal_pct, pro_pct, &target.goal);

@@ -2,7 +2,7 @@ use crate::calculator::{CalorieCalculator, MacroCalculator};
 use crate::config::PlanConfig;
 use crate::data::MealDatabase;
 use crate::error::{MealPlannerError, Result};
-use crate::models::{DailyPlan, Meal, MealType, MacroTarget, Nutrition, WeeklyPlan};
+use crate::models::{DailyPlan, MacroTarget, Meal, MealType, Nutrition, WeeklyPlan};
 use chrono::{Duration, NaiveDate};
 use rand::seq::SliceRandom;
 use std::collections::HashSet;
@@ -81,24 +81,16 @@ impl<'a> WeeklyPlanner<'a> {
             target.daily_calories * 0.23,
             tracker,
         )?;
-        let lunch = self.select_meal_with_dedup(
-            MealType::Lunch,
-            target.daily_calories * 0.33,
-            tracker,
-        )?;
-        let dinner = self.select_meal_with_dedup(
-            MealType::Dinner,
-            target.daily_calories * 0.34,
-            tracker,
-        )?;
-        let snack = self.select_meal_with_dedup(
-            MealType::Snack,
-            target.daily_calories * 0.10,
-            tracker,
-        )?;
+        let lunch =
+            self.select_meal_with_dedup(MealType::Lunch, target.daily_calories * 0.33, tracker)?;
+        let dinner =
+            self.select_meal_with_dedup(MealType::Dinner, target.daily_calories * 0.34, tracker)?;
+        let snack =
+            self.select_meal_with_dedup(MealType::Snack, target.daily_calories * 0.10, tracker)?;
 
         let meals = vec![breakfast, lunch, dinner, snack];
-        let total_nutrition = Nutrition::sum(&meals.iter().map(|m| &m.nutrition).collect::<Vec<_>>());
+        let total_nutrition =
+            Nutrition::sum(&meals.iter().map(|m| &m.nutrition).collect::<Vec<_>>());
 
         Ok(DailyPlan::new(
             Some(date.format("%Y-%m-%d").to_string()),
@@ -203,7 +195,10 @@ impl<'a> WeeklyPlanner<'a> {
             self.config.default_calories()
         };
 
-        Ok(MacroCalculator::calculate_macros(calories, self.config.goal))
+        Ok(MacroCalculator::calculate_macros(
+            calories,
+            self.config.goal,
+        ))
     }
 }
 
@@ -276,7 +271,12 @@ mod tests {
         let plan = planner.generate(None).unwrap();
 
         // 各食事タイプごとに重複をチェック
-        for meal_type in [MealType::Breakfast, MealType::Lunch, MealType::Dinner, MealType::Snack] {
+        for meal_type in [
+            MealType::Breakfast,
+            MealType::Lunch,
+            MealType::Dinner,
+            MealType::Snack,
+        ] {
             let meal_ids: Vec<String> = plan
                 .daily_plans
                 .iter()

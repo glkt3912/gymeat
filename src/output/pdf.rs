@@ -16,10 +16,7 @@ impl PdfFormatter {
 
     /// pandocがインストールされているか確認
     pub fn check_pandoc_available() -> bool {
-        Command::new("pandoc")
-            .arg("--version")
-            .output()
-            .is_ok()
+        Command::new("pandoc").arg("--version").output().is_ok()
     }
 }
 
@@ -73,9 +70,8 @@ pub fn write_daily_plan_to_pdf(
 
     // 一時ファイルに保存
     let temp_md = std::env::temp_dir().join("gymeat_temp.md");
-    std::fs::write(&temp_md, &markdown).map_err(|e| {
-        MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e))
-    })?;
+    std::fs::write(&temp_md, &markdown)
+        .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
 
     // pandocでPDF生成
     let output = Command::new("pandoc")
@@ -88,9 +84,7 @@ pub fn write_daily_plan_to_pdf(
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
-        .map_err(|e| {
-            MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e))
-        })?;
+        .map_err(|e| MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e)))?;
 
     // 一時ファイル削除
     let _ = std::fs::remove_file(&temp_md);
@@ -126,9 +120,8 @@ pub fn write_weekly_plan_to_pdf(
 
     // 一時ファイルに保存
     let temp_md = std::env::temp_dir().join("gymeat_temp_weekly.md");
-    std::fs::write(&temp_md, &markdown).map_err(|e| {
-        MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e))
-    })?;
+    std::fs::write(&temp_md, &markdown)
+        .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
 
     // pandocでPDF生成
     let output = Command::new("pandoc")
@@ -141,9 +134,7 @@ pub fn write_weekly_plan_to_pdf(
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
-        .map_err(|e| {
-            MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e))
-        })?;
+        .map_err(|e| MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e)))?;
 
     // 一時ファイル削除
     let _ = std::fs::remove_file(&temp_md);

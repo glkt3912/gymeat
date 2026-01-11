@@ -231,7 +231,11 @@ pub fn get_meals() -> Vec<Meal> {
                 carbohydrates: 90.0,
             },
             MealType::Lunch,
-            vec!["高タンパク".to_string(), "オメガ3".to_string(), "和食".to_string()],
+            vec![
+                "高タンパク".to_string(),
+                "オメガ3".to_string(),
+                "和食".to_string(),
+            ],
             20,
         ),
         Meal::new(

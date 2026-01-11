@@ -165,7 +165,11 @@ impl OutputFormatter for MarkdownFormatter {
 
         // 各日のプラン
         for (i, daily_plan) in plan.daily_plans.iter().enumerate() {
-            md.push_str(&format!("\n---\n\n## Day {} - {}\n\n", i + 1, daily_plan.date.as_deref().unwrap_or("")));
+            md.push_str(&format!(
+                "\n---\n\n## Day {} - {}\n\n",
+                i + 1,
+                daily_plan.date.as_deref().unwrap_or("")
+            ));
 
             // 各食事
             for meal in &daily_plan.meals {

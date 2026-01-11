@@ -11,11 +11,11 @@ pub enum Gender {
 /// 活動レベル
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ActivityLevel {
-    Sedentary,   // 1.2  (ほぼ運動なし)
-    Light,       // 1.375 (週1-3日)
-    Moderate,    // 1.55 (週3-5日)
-    Active,      // 1.725 (週6-7日)
-    VeryActive,  // 1.9  (1日2回以上)
+    Sedentary,  // 1.2  (ほぼ運動なし)
+    Light,      // 1.375 (週1-3日)
+    Moderate,   // 1.55 (週3-5日)
+    Active,     // 1.725 (週6-7日)
+    VeryActive, // 1.9  (1日2回以上)
 }
 
 impl ActivityLevel {
@@ -35,10 +35,10 @@ impl ActivityLevel {
 #[derive(Debug, Clone)]
 pub struct PlanConfig {
     pub goal: Goal,
-    pub weight: Option<f32>,          // 体重 (kg)
-    pub height: Option<f32>,          // 身長 (cm)
-    pub age: Option<u32>,             // 年齢
-    pub gender: Option<Gender>,       // 性別
+    pub weight: Option<f32>,    // 体重 (kg)
+    pub height: Option<f32>,    // 身長 (cm)
+    pub age: Option<u32>,       // 年齢
+    pub gender: Option<Gender>, // 性別
     pub activity_level: ActivityLevel,
     pub custom_calories: Option<f32>, // カスタムカロリー目標
 }
@@ -91,10 +91,15 @@ impl PlanConfig {
         if self.custom_calories.is_none() {
             if self.weight.is_some() || self.height.is_some() || self.age.is_some() {
                 // いずれかが指定されている場合、すべて必要
-                if self.weight.is_none() || self.height.is_none() || self.age.is_none() || self.gender.is_none() {
+                if self.weight.is_none()
+                    || self.height.is_none()
+                    || self.age.is_none()
+                    || self.gender.is_none()
+                {
                     return Err(MealPlannerError::ConfigValidationError(
                         "カロリー計算には体重、身長、年齢、性別のすべてが必要です。\
-                         または --calories オプションでカロリーを直接指定してください。".to_string()
+                         または --calories オプションでカロリーを直接指定してください。"
+                            .to_string(),
                     ));
                 }
             }
@@ -172,7 +177,7 @@ mod tests {
     fn test_incomplete_body_stats() {
         let config = PlanConfig {
             goal: Goal::Maintain,
-            weight: Some(70.0),  // 体重だけ指定
+            weight: Some(70.0), // 体重だけ指定
             height: None,
             age: None,
             gender: None,
