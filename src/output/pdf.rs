@@ -7,6 +7,7 @@ use std::path::Path;
 use std::process::Command;
 
 /// PDF出力フォーマッター (pandoc依存)
+#[derive(Default)]
 pub struct PdfFormatter;
 
 impl PdfFormatter {

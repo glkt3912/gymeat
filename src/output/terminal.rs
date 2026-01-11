@@ -302,13 +302,13 @@ impl TerminalOutput {
             };
 
             println!(
-                "  [{}] {} ({} kcal | P:{}g F:{}g C:{}g)",
+                "  [{}] {} ({:.0} kcal | P:{:.0}g F:{:.0}g C:{:.0}g)",
                 self.colorize_label(meal_type_label),
                 self.colorize_meal_name(&meal.name),
-                format!("{:.0}", meal.nutrition.calories),
-                format!("{:.0}", meal.nutrition.protein),
-                format!("{:.0}", meal.nutrition.fat),
-                format!("{:.0}", meal.nutrition.carbohydrates),
+                meal.nutrition.calories,
+                meal.nutrition.protein,
+                meal.nutrition.fat,
+                meal.nutrition.carbohydrates,
             );
         }
     }

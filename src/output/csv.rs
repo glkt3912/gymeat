@@ -4,6 +4,7 @@ use crate::error::Result;
 use crate::models::{DailyPlan, MealType, WeeklyPlan};
 
 /// CSV出力フォーマッター
+#[derive(Default)]
 pub struct CsvFormatter;
 
 impl CsvFormatter {

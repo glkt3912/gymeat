@@ -4,6 +4,7 @@ use crate::error::Result;
 use crate::models::{DailyPlan, Goal, MealType, WeeklyPlan};
 
 /// Markdown出力フォーマッター
+#[derive(Default)]
 pub struct MarkdownFormatter;
 
 impl MarkdownFormatter {
@@ -76,7 +77,7 @@ impl OutputFormatter for MarkdownFormatter {
                 for ingredient in &meal.ingredients {
                     md.push_str(&format!("- {}\n", ingredient));
                 }
-                md.push_str("\n");
+                md.push('\n');
             }
 
             // タグ
@@ -91,7 +92,7 @@ impl OutputFormatter for MarkdownFormatter {
                     for (i, step) in recipe.steps.iter().enumerate() {
                         md.push_str(&format!("{}. {}\n", i + 1, step));
                     }
-                    md.push_str("\n");
+                    md.push('\n');
                 }
             }
         }
@@ -197,7 +198,7 @@ impl OutputFormatter for MarkdownFormatter {
                     for ingredient in &meal.ingredients {
                         md.push_str(&format!("- {}\n", ingredient));
                     }
-                    md.push_str("\n");
+                    md.push('\n');
                 }
 
                 // レシピ
@@ -207,7 +208,7 @@ impl OutputFormatter for MarkdownFormatter {
                         for (j, step) in recipe.steps.iter().enumerate() {
                             md.push_str(&format!("{}. {}\n", j + 1, step));
                         }
-                        md.push_str("\n");
+                        md.push('\n');
                     }
                 }
             }
