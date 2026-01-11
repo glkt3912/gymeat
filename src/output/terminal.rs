@@ -1,5 +1,5 @@
 use crate::data::MealDatabase;
-use crate::models::{DailyPlan, Goal, Meal, MealType, Nutrition, WeeklyPlan};
+use crate::models::{DailyPlan, Goal, Meal, MealType, MonthlyPlan, Nutrition, WeeklyPlan};
 use colored::*;
 
 /// ターミナル出力
@@ -357,6 +357,89 @@ impl TerminalOutput {
         // 目標達成率
         let target_weekly_cal = plan.target.daily_calories * 7.0;
         let cal_pct = (total.calories / target_weekly_cal) * 100.0;
+        println!("    目標達成率: {}%", self.colorize_percentage(cal_pct));
+    }
+
+    /// 月間プランを表示
+    pub fn print_monthly_plan(
+        &self,
+        plan: &MonthlyPlan,
+        _database: &MealDatabase,
+        _show_recipe: bool,
+    ) {
+        self.print_monthly_header(&plan.target.goal, &plan.start_date);
+
+        println!("\n{}", "━".repeat(80));
+        self.print_target(&plan.target);
+        println!("{}\n", "━".repeat(80));
+
+        // 各日のプランを表示
+        for (idx, daily_plan) in plan.daily_plans.iter().enumerate() {
+            let day_label = format!("Day {} ({})", idx + 1, daily_plan.date.as_ref().unwrap());
+            println!("\n{}", self.colorize_day_header(&day_label));
+            println!("{}", "─".repeat(80));
+
+            self.print_meals_compact(&daily_plan.meals);
+            self.print_daily_summary(&daily_plan.total_nutrition, &daily_plan.target);
+
+            if idx < plan.daily_plans.len() - 1 {
+                println!("\n{}", "━".repeat(80));
+            }
+        }
+
+        // 月間サマリー
+        println!("\n{}", "━".repeat(80));
+        self.print_monthly_summary(plan);
+    }
+
+    fn print_monthly_header(&self, goal: &Goal, start_date: &str) {
+        let title = match goal {
+            Goal::Bulk => "30日間食事プラン (増量モード)",
+            Goal::Cut => "30日間食事プラン (減量モード)",
+            Goal::Maintain => "30日間食事プラン (維持モード)",
+        };
+
+        println!("\n{}", "━".repeat(80));
+        println!("     {}", self.colorize_title(title));
+        println!("     開始日: {}", start_date);
+        println!("{}", "━".repeat(80));
+    }
+
+    /// 月間サマリー
+    fn print_monthly_summary(&self, plan: &MonthlyPlan) {
+        println!("\n月間統計:");
+
+        let avg = plan.average_nutrition();
+        let total = plan.total_nutrition();
+
+        println!("  1日平均:");
+        println!(
+            "    カロリー: {} kcal",
+            self.colorize_value(&format!("{:.0}", avg.calories))
+        );
+        println!(
+            "    タンパク質: {} g",
+            self.colorize_value(&format!("{:.0}", avg.protein))
+        );
+        println!(
+            "    脂質: {} g",
+            self.colorize_value(&format!("{:.0}", avg.fat))
+        );
+        println!(
+            "    炭水化物: {} g",
+            self.colorize_value(&format!("{:.0}", avg.carbohydrates))
+        );
+
+        println!("\n  月間合計:");
+        println!(
+            "    カロリー: {} kcal",
+            self.colorize_value(&format!("{:.0}", total.calories))
+        );
+
+        // 目標達成率
+        let days = plan.daily_plans.len() as f32;
+        let target_monthly_cal = plan.target.daily_calories * days;
+        let cal_pct = (total.calories / target_monthly_cal) * 100.0;
         println!("    目標達成率: {}%", self.colorize_percentage(cal_pct));
     }
 }

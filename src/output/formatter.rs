@@ -1,6 +1,6 @@
 use crate::data::MealDatabase;
 use crate::error::Result;
-use crate::models::{DailyPlan, WeeklyPlan};
+use crate::models::{DailyPlan, MonthlyPlan, WeeklyPlan};
 use std::path::PathBuf;
 
 /// 出力フォーマッターの共通trait
@@ -17,6 +17,14 @@ pub trait OutputFormatter {
     fn format_weekly_plan(
         &self,
         plan: &WeeklyPlan,
+        database: &MealDatabase,
+        show_recipe: bool,
+    ) -> Result<String>;
+
+    /// 月間プランを文字列に変換
+    fn format_monthly_plan(
+        &self,
+        plan: &MonthlyPlan,
         database: &MealDatabase,
         show_recipe: bool,
     ) -> Result<String>;

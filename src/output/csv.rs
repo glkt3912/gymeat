@@ -1,7 +1,7 @@
 use super::formatter::OutputFormatter;
 use crate::data::MealDatabase;
 use crate::error::Result;
-use crate::models::{DailyPlan, MealType, WeeklyPlan};
+use crate::models::{DailyPlan, MealType, MonthlyPlan, WeeklyPlan};
 
 /// CSV出力フォーマッター
 #[derive(Default)]
@@ -118,6 +118,82 @@ impl OutputFormatter for CsvFormatter {
         ));
 
         // 週間平均
+        let daily_avg = plan.average_nutrition();
+        csv.push_str(&format!(
+            "{},DAILY_AVERAGE,Daily Average,{:.1},{:.1},{:.1},{:.1},,\n",
+            escape_csv(&plan.start_date),
+            daily_avg.calories,
+            daily_avg.protein,
+            daily_avg.fat,
+            daily_avg.carbohydrates
+        ));
+
+        // 目標値
+        csv.push_str(&format!(
+            "{},TARGET,Daily Target,{:.1},{:.1},{:.1},{:.1},,\n",
+            escape_csv(&plan.start_date),
+            plan.target.daily_calories,
+            plan.target.protein_grams,
+            plan.target.fat_grams,
+            plan.target.carbs_grams
+        ));
+
+        Ok(csv)
+    }
+
+    fn format_monthly_plan(
+        &self,
+        plan: &MonthlyPlan,
+        _database: &MealDatabase,
+        _show_recipe: bool,
+    ) -> Result<String> {
+        let mut csv = String::new();
+
+        // ヘッダー行
+        csv.push_str("Date,MealType,MealName,Calories,Protein,Fat,Carbs,PrepTime,Tags\n");
+
+        // 各日のプランを順次追加
+        for daily_plan in &plan.daily_plans {
+            let date_str = daily_plan.date.as_deref().unwrap_or("");
+
+            for meal in &daily_plan.meals {
+                csv.push_str(&format!(
+                    "{},{},{},{:.1},{:.1},{:.1},{:.1},{},{}\n",
+                    escape_csv(date_str),
+                    meal_type_label(meal.meal_type),
+                    escape_csv(&meal.name),
+                    meal.nutrition.calories,
+                    meal.nutrition.protein,
+                    meal.nutrition.fat,
+                    meal.nutrition.carbohydrates,
+                    meal.prep_time,
+                    escape_csv(&meal.tags.join("; "))
+                ));
+            }
+
+            // 日次サマリー
+            csv.push_str(&format!(
+                "{},DAILY_TOTAL,Daily Total,{:.1},{:.1},{:.1},{:.1},,\n",
+                escape_csv(date_str),
+                daily_plan.total_nutrition.calories,
+                daily_plan.total_nutrition.protein,
+                daily_plan.total_nutrition.fat,
+                daily_plan.total_nutrition.carbohydrates
+            ));
+        }
+
+        // 月間サマリー
+        let monthly_total = plan.total_nutrition();
+        csv.push_str(&format!(
+            "{},MONTHLY_TOTAL,Monthly Total,{:.1},{:.1},{:.1},{:.1},,\n",
+            escape_csv(&plan.start_date),
+            monthly_total.calories,
+            monthly_total.protein,
+            monthly_total.fat,
+            monthly_total.carbohydrates
+        ));
+
+        // 月間平均
         let daily_avg = plan.average_nutrition();
         csv.push_str(&format!(
             "{},DAILY_AVERAGE,Daily Average,{:.1},{:.1},{:.1},{:.1},,\n",

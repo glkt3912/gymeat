@@ -7,10 +7,11 @@ use gymeat::{
     error::MealPlannerError,
     models::MealType,
     output::{
-        write_daily_plan_to_pdf, write_output, write_weekly_plan_to_pdf, CsvFormatter,
-        JsonFormatter, MarkdownFormatter, OutputDestination, OutputFormatter, TerminalOutput,
+        write_daily_plan_to_pdf, write_monthly_plan_to_pdf, write_output, write_weekly_plan_to_pdf,
+        CsvFormatter, JsonFormatter, MarkdownFormatter, OutputDestination, OutputFormatter,
+        TerminalOutput,
     },
-    planner::{DailyPlanner, WeeklyPlanner},
+    planner::{DailyPlanner, MonthlyPlanner, WeeklyPlanner},
     Result,
 };
 use std::path::PathBuf;
@@ -77,18 +78,78 @@ fn main() -> Result<()> {
         OutputDestination::Stdout
     };
 
-    // 週間プランまたは日次プラン
-    if args.weekly {
-        // 開始日のパース
-        let start_date = if let Some(date_str) = args.start_date {
-            Some(
-                NaiveDate::parse_from_str(&date_str, "%Y-%m-%d")
-                    .map_err(|_| MealPlannerError::InvalidDate(date_str))?,
-            )
-        } else {
-            None
-        };
+    // 開始日のパース (週間/月間プラン共通)
+    let start_date = if let Some(date_str) = &args.start_date {
+        Some(
+            NaiveDate::parse_from_str(date_str, "%Y-%m-%d")
+                .map_err(|_| MealPlannerError::InvalidDate(date_str.clone()))?,
+        )
+    } else {
+        None
+    };
 
+    // 月間プラン、週間プラン、または日次プラン
+    if args.monthly {
+        // 月間プラン生成
+        let planner = MonthlyPlanner::new(&database, &config);
+        let plan = planner.generate(start_date)?;
+
+        // フォーマット別出力
+        match args.output {
+            OutputFormatArg::Terminal => {
+                let enable_color = !args.no_color && atty::is(atty::Stream::Stdout);
+                let output = TerminalOutput::new(enable_color);
+                output.print_monthly_plan(&plan, &database, args.recipe);
+                println!(); // 最後に改行
+            }
+            OutputFormatArg::Json => {
+                let formatter = JsonFormatter::new(false);
+                let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::JsonPretty => {
+                let formatter = JsonFormatter::new(true);
+                let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::Csv => {
+                let formatter = CsvFormatter::new();
+                let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!("✅ CSV出力が完了しました: {}", args.output_file.unwrap());
+                }
+            }
+            OutputFormatArg::Markdown => {
+                let formatter = MarkdownFormatter::new();
+                let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
+                write_output(&content, destination)?;
+                if args.output_file.is_some() {
+                    println!(
+                        "✅ Markdown出力が完了しました: {}",
+                        args.output_file.unwrap()
+                    );
+                }
+            }
+            OutputFormatArg::Pdf => {
+                if let Some(path_str) = &args.output_file {
+                    let path = PathBuf::from(path_str);
+                    write_monthly_plan_to_pdf(&plan, &database, args.recipe, &path)?;
+                    println!("✅ PDF出力が完了しました: {}", path_str);
+                } else {
+                    return Err(MealPlannerError::OutputError(
+                        "PDF出力には--output-fileオプションが必要です".to_string(),
+                    ));
+                }
+            }
+        }
+    } else if args.weekly {
         // 週間プラン生成
         let planner = WeeklyPlanner::new(&database, &config);
         let plan = planner.generate(start_date)?;
