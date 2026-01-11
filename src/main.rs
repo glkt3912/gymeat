@@ -7,9 +7,9 @@ use gymeat::{
     error::MealPlannerError,
     models::MealType,
     output::{
-        write_daily_plan_to_pdf, write_monthly_plan_to_pdf, write_output,
-        write_weekly_plan_to_pdf, CsvFormatter, JsonFormatter, MarkdownFormatter,
-        OutputDestination, OutputFormatter, TerminalOutput,
+        write_daily_plan_to_pdf, write_monthly_plan_to_pdf, write_output, write_weekly_plan_to_pdf,
+        CsvFormatter, JsonFormatter, MarkdownFormatter, OutputDestination, OutputFormatter,
+        TerminalOutput,
     },
     planner::{DailyPlanner, MonthlyPlanner, WeeklyPlanner},
     Result,
