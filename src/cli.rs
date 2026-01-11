@@ -27,6 +27,12 @@ use clap::{Parser, ValueEnum};
   # 週間プラン生成 (指定日から7日間)
   gymeat --weekly --start-date 2026-01-13 --goal cut
 
+  # 月間プラン生成 (今日から30日間)
+  gymeat --monthly --goal maintain
+
+  # 月間プラン生成 (指定日から30日間)
+  gymeat --monthly --start-date 2026-02-01 --goal bulk
+
   # JSON形式で出力
   gymeat --output json --output-file plan.json
 
@@ -78,11 +84,15 @@ pub struct CliArgs {
     pub verbose: bool,
 
     /// 7日間の週間プランを生成
-    #[arg(long)]
+    #[arg(long, conflicts_with = "monthly")]
     pub weekly: bool,
 
-    /// 週間プラン開始日 (YYYY-MM-DD形式, デフォルト: 今日)
-    #[arg(long, requires = "weekly")]
+    /// 30日間の月間プランを生成
+    #[arg(long, conflicts_with = "weekly")]
+    pub monthly: bool,
+
+    /// プラン開始日 (YYYY-MM-DD形式, デフォルト: 今日)
+    #[arg(long)]
     pub start_date: Option<String>,
 
     /// 出力フォーマット: terminal (ターミナル), json, json-pretty, csv, markdown, pdf
