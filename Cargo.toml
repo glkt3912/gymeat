@@ -23,6 +23,12 @@ atty = "0.2"
 # 日付処理
 chrono = "0.4"
 
+# UUID生成 (履歴管理用)
+uuid = { version = "1.0", features = ["v4"] }
+
+# ホームディレクトリ取得
+dirs = "5.0"
+
 # エラーハンドリング
 thiserror = "1.0"
 

@@ -1,4 +1,4 @@
-use clap::{Parser, ValueEnum};
+use clap::{Args, Parser, Subcommand, ValueEnum};
 
 /// 筋トレ用食事メニュー生成ツール
 #[derive(Parser, Debug)]
@@ -40,9 +40,22 @@ use clap::{Parser, ValueEnum};
   gymeat --weekly --output csv --output-file weekly.csv
 
   # PDF形式で出力 (要pandoc)
-  gymeat --output pdf --output-file plan.pdf"
+  gymeat --output pdf --output-file plan.pdf
+
+  # プラン生成と同時に履歴に保存
+  gymeat --goal bulk --save
+
+  # 履歴一覧を表示
+  gymeat history list
+
+  # 履歴詳細を表示
+  gymeat history show <ID>"
 )]
 pub struct CliArgs {
+    /// サブコマンド
+    #[command(subcommand)]
+    pub command: Option<Commands>,
+
     /// トレーニング目的: bulk (増量), cut (減量), maintain (維持)
     #[arg(short, long, default_value = "maintain")]
     pub goal: GoalArg,
@@ -102,6 +115,103 @@ pub struct CliArgs {
     /// 出力先ファイルパス (指定しない場合は標準出力、PDF出力時は必須)
     #[arg(long)]
     pub output_file: Option<String>,
+
+    /// 生成したプランを履歴に保存
+    #[arg(long)]
+    pub save: bool,
+}
+
+/// サブコマンド
+#[derive(Subcommand, Debug)]
+pub enum Commands {
+    /// 履歴を管理
+    History(HistoryArgs),
+}
+
+/// 履歴コマンドの引数
+#[derive(Args, Debug)]
+pub struct HistoryArgs {
+    #[command(subcommand)]
+    pub command: HistoryCommands,
+}
+
+/// 履歴サブコマンド
+#[derive(Subcommand, Debug)]
+pub enum HistoryCommands {
+    /// 履歴一覧を表示
+    List(HistoryListArgs),
+    /// 履歴の詳細を表示
+    Show(HistoryShowArgs),
+    /// 履歴を削除
+    Delete(HistoryDeleteArgs),
+}
+
+/// 履歴一覧コマンドの引数
+#[derive(Args, Debug)]
+pub struct HistoryListArgs {
+    /// 目的でフィルタ (bulk/cut/maintain)
+    #[arg(long)]
+    pub goal: Option<GoalArg>,
+
+    /// プランタイプでフィルタ (daily/weekly/monthly)
+    #[arg(long, value_name = "TYPE")]
+    pub plan_type: Option<PlanTypeArg>,
+
+    /// 開始日でフィルタ (YYYY-MM-DD)
+    #[arg(long)]
+    pub from: Option<String>,
+
+    /// 終了日でフィルタ (YYYY-MM-DD)
+    #[arg(long)]
+    pub to: Option<String>,
+
+    /// 直近の期間でフィルタ (例: 7d, 30d)
+    #[arg(long)]
+    pub last: Option<String>,
+
+    /// 表示件数制限
+    #[arg(short = 'n', long, default_value = "10")]
+    pub limit: usize,
+}
+
+/// 履歴詳細コマンドの引数
+#[derive(Args, Debug)]
+pub struct HistoryShowArgs {
+    /// 履歴ID (先頭8文字でもOK)
+    #[arg(required_unless_present = "latest")]
+    pub id: Option<String>,
+
+    /// 最新の履歴を表示
+    #[arg(long)]
+    pub latest: bool,
+}
+
+/// 履歴削除コマンドの引数
+#[derive(Args, Debug)]
+pub struct HistoryDeleteArgs {
+    /// 削除する履歴ID (先頭8文字でもOK)
+    pub id: String,
+}
+
+/// プランタイプの引数
+#[derive(Debug, Clone, Copy, ValueEnum)]
+pub enum PlanTypeArg {
+    /// 日次プラン
+    Daily,
+    /// 週間プラン
+    Weekly,
+    /// 月間プラン
+    Monthly,
+}
+
+impl From<PlanTypeArg> for crate::history::PlanType {
+    fn from(arg: PlanTypeArg) -> Self {
+        match arg {
+            PlanTypeArg::Daily => crate::history::PlanType::Daily,
+            PlanTypeArg::Weekly => crate::history::PlanType::Weekly,
+            PlanTypeArg::Monthly => crate::history::PlanType::Monthly,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, ValueEnum)]
