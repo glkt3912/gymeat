@@ -49,11 +49,8 @@ jobs:
       run: cargo clippy -- -D warnings
       if: matrix.rust == 'stable'
 
-    - name: Check Cargo.lock
-      run: cargo update --locked
-
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --locked --verbose
 
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --locked --verbose
