@@ -1,6 +1,7 @@
 use std::fs;
 use std::path::PathBuf;
 
+use crate::constants::{APP_DIR_NAME, HISTORY_DIR_NAME, INDEX_FILE_NAME, PLANS_DIR_NAME};
 use crate::error::{MealPlannerError, Result};
 use crate::history::models::{HistoryEntry, HistoryIndex};
 
@@ -16,9 +17,9 @@ impl HistoryStorage {
     /// 新しいストレージインスタンスを作成
     pub fn new() -> Result<Self> {
         let base_dir = Self::get_base_dir()?;
-        let history_dir = base_dir.join("history");
-        let plans_dir = history_dir.join("plans");
-        let index_path = history_dir.join("index.json");
+        let history_dir = base_dir.join(HISTORY_DIR_NAME);
+        let plans_dir = history_dir.join(PLANS_DIR_NAME);
+        let index_path = history_dir.join(INDEX_FILE_NAME);
 
         Ok(Self {
             base_dir,
@@ -31,7 +32,7 @@ impl HistoryStorage {
     /// ベースディレクトリを取得 (~/.gymeat)
     fn get_base_dir() -> Result<PathBuf> {
         dirs::home_dir()
-            .map(|home| home.join(".gymeat"))
+            .map(|home| home.join(APP_DIR_NAME))
             .ok_or_else(|| {
                 MealPlannerError::HistoryError("ホームディレクトリを取得できません".to_string())
             })

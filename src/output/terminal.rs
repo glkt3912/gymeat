@@ -1,3 +1,4 @@
+use crate::constants::{ACHIEVEMENT_LOWER_BOUND, ACHIEVEMENT_UPPER_BOUND};
 use crate::data::MealDatabase;
 use crate::models::{DailyPlan, Goal, Meal, MealType, MonthlyPlan, Nutrition, WeeklyPlan};
 use colored::*;
@@ -156,9 +157,9 @@ impl TerminalOutput {
         println!("\n📊 評価:");
 
         // カロリー達成度
-        if (90.0..=110.0).contains(&cal_pct) {
+        if (ACHIEVEMENT_LOWER_BOUND as f32..=ACHIEVEMENT_UPPER_BOUND as f32).contains(&cal_pct) {
             println!("  ✅ カロリー目標を達成しています!");
-        } else if cal_pct < 90.0 {
+        } else if cal_pct < ACHIEVEMENT_LOWER_BOUND as f32 {
             let diff = ((100.0 - cal_pct) as i32).abs();
             println!("  ⚠️  カロリーが目標より{}%少ないです", diff);
             println!("     💡 間食を追加するか、主食の量を増やしてみましょう");
@@ -171,7 +172,7 @@ impl TerminalOutput {
         }
 
         // タンパク質達成度
-        if pro_pct >= 90.0 {
+        if pro_pct >= ACHIEVEMENT_LOWER_BOUND as f32 {
             println!("  ✅ タンパク質も十分に摂取できています");
         } else {
             println!("  ⚠️  タンパク質が不足しています ({}%)", pro_pct as i32);
@@ -230,8 +231,8 @@ impl TerminalOutput {
             return pct_str;
         }
 
-        // 90-110%: 緑、それ以外: 黄色
-        if (90.0..=110.0).contains(&pct) {
+        // 達成度範囲内: 緑、それ以外: 黄色
+        if (ACHIEVEMENT_LOWER_BOUND as f32..=ACHIEVEMENT_UPPER_BOUND as f32).contains(&pct) {
             pct_str.green().to_string()
         } else {
             pct_str.yellow().to_string()

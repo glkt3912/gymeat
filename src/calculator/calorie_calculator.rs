@@ -1,4 +1,5 @@
 use crate::config::{ActivityLevel, Gender};
+use crate::constants::{BULK_CALORIE_SURPLUS, CUT_CALORIE_DEFICIT};
 use crate::models::Goal;
 
 /// カロリー計算機
@@ -50,9 +51,9 @@ impl CalorieCalculator {
     /// カロリー目標 (kcal/日)
     pub fn calculate_target_calories(tdee: f32, goal: Goal) -> f32 {
         match goal {
-            Goal::Bulk => tdee + 300.0, // 増量: +300kcal
-            Goal::Cut => tdee - 500.0,  // 減量: -500kcal
-            Goal::Maintain => tdee,     // 維持: そのまま
+            Goal::Bulk => tdee + BULK_CALORIE_SURPLUS as f32,
+            Goal::Cut => tdee - CUT_CALORIE_DEFICIT as f32,
+            Goal::Maintain => tdee,
         }
     }
 }
