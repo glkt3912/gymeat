@@ -48,11 +48,10 @@ pub fn write_output(content: &str, destination: OutputDestination) -> Result<()>
         }
         OutputDestination::File(path) => {
             std::fs::write(&path, content).map_err(|e| {
-                crate::error::MealPlannerError::FileWriteError(format!(
-                    "ファイル書き込み失敗 ({}): {}",
-                    path.display(),
-                    e
-                ))
+                crate::error::MealPlannerError::FileWriteError {
+                    path: path.display().to_string(),
+                    source: e,
+                }
             })?;
             Ok(())
         }
