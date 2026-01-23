@@ -120,6 +120,37 @@ gymeat --weekly --start-date 2026-02-01 --goal cut --calories 2000
 - 開始日を指定可能（デフォルトは今日）
 ```
 
+### 履歴管理
+
+生成したプランを履歴に保存・管理できます。履歴は `~/.gymeat/history/` に保存されます。
+
+```bash
+# プラン生成と同時に履歴に保存
+gymeat --goal bulk --save
+gymeat --weekly --goal cut --save
+
+# 履歴一覧を表示（最新10件）
+gymeat history list
+
+# フィルタを使って履歴を検索
+gymeat history list --goal bulk           # 増量プランのみ
+gymeat history list --plan-type weekly    # 週間プランのみ
+gymeat history list --last 7d             # 直近7日間
+
+# 履歴の詳細を表示
+gymeat history show <ID>
+gymeat history show --latest              # 最新の履歴を表示
+
+# 履歴を削除
+gymeat history delete <ID>
+```
+
+**履歴機能の特徴:**
+- プラン生成時に `--save` オプションで履歴に保存
+- 履歴はJSON形式で保存され、ユーザーが直接確認可能
+- 目的（bulk/cut/maintain）やプランタイプでフィルタ可能
+- IDの先頭8文字で検索可能（完全なUUIDを入力する必要なし）
+
 ### オプション
 
 ```
@@ -168,6 +199,9 @@ Options:
 
       --output-file <PATH>
           出力先ファイルパス (指定しない場合は標準出力、PDF出力時は必須)
+
+      --save
+          生成したプランを履歴に保存
 
   -h, --help
           ヘルプを表示
@@ -285,9 +319,9 @@ gymeat/
 - [x] 週間プラン生成
 - [x] JSON/CSV/Markdown/PDF出力
 - [x] 月間プラン生成
+- [x] 履歴管理機能
 - [ ] 除外食材フィルタ
 - [ ] 外部ファイルからのカスタムメニュー読み込み
-- [ ] 履歴管理機能
 
 ## ライセンス
 
