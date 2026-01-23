@@ -6,6 +6,22 @@ use crate::models::{DailyPlan, MonthlyPlan, WeeklyPlan};
 use std::path::Path;
 use std::process::Command;
 
+/// OS別のCJKフォントを取得
+fn get_cjk_font() -> &'static str {
+    #[cfg(target_os = "macos")]
+    {
+        "Hiragino Sans"
+    }
+    #[cfg(target_os = "windows")]
+    {
+        "Yu Gothic"
+    }
+    #[cfg(not(any(target_os = "macos", target_os = "windows")))]
+    {
+        "Noto Sans CJK JP"
+    }
+}
+
 /// PDF出力フォーマッター (pandoc依存)
 #[derive(Default)]
 pub struct PdfFormatter;
@@ -93,7 +109,7 @@ pub fn write_daily_plan_to_pdf(
         .arg(output_path)
         .arg("--pdf-engine=xelatex") // 日本語対応
         .arg("-V")
-        .arg("CJKmainfont=Hiragino Sans") // macOS用フォント (環境により調整が必要)
+        .arg(format!("CJKmainfont={}", get_cjk_font())) // macOS用フォント (環境により調整が必要)
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
@@ -143,7 +159,7 @@ pub fn write_weekly_plan_to_pdf(
         .arg(output_path)
         .arg("--pdf-engine=xelatex") // 日本語対応
         .arg("-V")
-        .arg("CJKmainfont=Hiragino Sans") // macOS用フォント
+        .arg(format!("CJKmainfont={}", get_cjk_font())) // macOS用フォント
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
@@ -193,7 +209,7 @@ pub fn write_monthly_plan_to_pdf(
         .arg(output_path)
         .arg("--pdf-engine=xelatex") // 日本語対応
         .arg("-V")
-        .arg("CJKmainfont=Hiragino Sans") // macOS用フォント
+        .arg(format!("CJKmainfont={}", get_cjk_font())) // macOS用フォント
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
