@@ -33,16 +33,15 @@ impl HistoryStorage {
     fn get_base_dir() -> Result<PathBuf> {
         dirs::home_dir()
             .map(|home| home.join(APP_DIR_NAME))
-            .ok_or_else(|| {
-                MealPlannerError::HistoryError("ホームディレクトリを取得できません".to_string())
-            })
+            .ok_or(MealPlannerError::HistoryHomeDirNotFound)
     }
 
     /// 必要なディレクトリを初期化
     pub fn initialize(&self) -> Result<()> {
         // ディレクトリ作成
-        fs::create_dir_all(&self.plans_dir).map_err(|e| {
-            MealPlannerError::HistoryError(format!("履歴ディレクトリの作成に失敗しました: {}", e))
+        fs::create_dir_all(&self.plans_dir).map_err(|e| MealPlannerError::HistoryDirCreationFailed {
+            path: self.plans_dir.clone(),
+            source: e,
         })?;
 
         // インデックスファイルが存在しなければ作成
@@ -61,25 +60,29 @@ impl HistoryStorage {
         }
 
         let content = fs::read_to_string(&self.index_path).map_err(|e| {
-            MealPlannerError::HistoryError(format!("インデックスの読み込みに失敗しました: {}", e))
+            MealPlannerError::HistoryReadFailed {
+                path: self.index_path.clone(),
+                source: e,
+            }
         })?;
 
-        serde_json::from_str(&content).map_err(|e| {
-            MealPlannerError::HistoryError(format!("インデックスのパースに失敗しました: {}", e))
+        serde_json::from_str(&content).map_err(|e| MealPlannerError::HistoryParseFailed {
+            context: "インデックス".to_string(),
+            source: e,
         })
     }
 
     /// インデックスを保存
     pub fn save_index(&self, index: &HistoryIndex) -> Result<()> {
-        let content = serde_json::to_string_pretty(index).map_err(|e| {
-            MealPlannerError::HistoryError(format!(
-                "インデックスのシリアライズに失敗しました: {}",
-                e
-            ))
-        })?;
+        let content =
+            serde_json::to_string_pretty(index).map_err(|e| MealPlannerError::HistorySerializeFailed {
+                context: "インデックス".to_string(),
+                source: e,
+            })?;
 
-        fs::write(&self.index_path, content).map_err(|e| {
-            MealPlannerError::HistoryError(format!("インデックスの保存に失敗しました: {}", e))
+        fs::write(&self.index_path, content).map_err(|e| MealPlannerError::HistoryWriteFailed {
+            path: self.index_path.clone(),
+            source: e,
         })
     }
 
@@ -90,12 +93,15 @@ impl HistoryStorage {
 
         // プランデータを保存
         let plan_path = self.plans_dir.join(format!("{}.json", entry.id));
-        let content = serde_json::to_string_pretty(entry).map_err(|e| {
-            MealPlannerError::HistoryError(format!("プランのシリアライズに失敗しました: {}", e))
-        })?;
+        let content =
+            serde_json::to_string_pretty(entry).map_err(|e| MealPlannerError::HistorySerializeFailed {
+                context: "プラン".to_string(),
+                source: e,
+            })?;
 
-        fs::write(&plan_path, content).map_err(|e| {
-            MealPlannerError::HistoryError(format!("プランの保存に失敗しました: {}", e))
+        fs::write(&plan_path, &content).map_err(|e| MealPlannerError::HistoryWriteFailed {
+            path: plan_path.clone(),
+            source: e,
         })?;
 
         // インデックスを更新
@@ -120,12 +126,14 @@ impl HistoryStorage {
             return Err(MealPlannerError::HistoryNotFound(id.to_string()));
         }
 
-        let content = fs::read_to_string(&plan_path).map_err(|e| {
-            MealPlannerError::HistoryError(format!("プランの読み込みに失敗しました: {}", e))
+        let content = fs::read_to_string(&plan_path).map_err(|e| MealPlannerError::HistoryReadFailed {
+            path: plan_path.clone(),
+            source: e,
         })?;
 
-        serde_json::from_str(&content).map_err(|e| {
-            MealPlannerError::HistoryError(format!("プランのパースに失敗しました: {}", e))
+        serde_json::from_str(&content).map_err(|e| MealPlannerError::HistoryParseFailed {
+            context: format!("プラン (ID: {})", id),
+            source: e,
         })
     }
 
@@ -141,8 +149,9 @@ impl HistoryStorage {
         // プランファイルを削除
         let plan_path = self.plans_dir.join(format!("{}.json", full_id));
         if plan_path.exists() {
-            fs::remove_file(&plan_path).map_err(|e| {
-                MealPlannerError::HistoryError(format!("プランの削除に失敗しました: {}", e))
+            fs::remove_file(&plan_path).map_err(|e| MealPlannerError::HistoryDeleteFailed {
+                path: plan_path.clone(),
+                source: e,
             })?;
         }
 
