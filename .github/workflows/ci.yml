@@ -16,7 +16,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest, windows-latest]
         rust: [stable]
 
     steps:
@@ -43,14 +43,18 @@ jobs:
 
     - name: Check formatting
       run: cargo fmt -- --check
+      shell: bash
       if: matrix.rust == 'stable'
 
     - name: Run clippy
       run: cargo clippy -- -D warnings
+      shell: bash
       if: matrix.rust == 'stable'
 
     - name: Build
       run: cargo build --locked --verbose
+      shell: bash
 
     - name: Run tests
       run: cargo test --locked --verbose
+      shell: bash
