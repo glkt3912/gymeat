@@ -433,11 +433,11 @@ fn handle_history_show(
     let entry = if args.latest {
         storage
             .load_latest()?
-            .ok_or_else(|| MealPlannerError::HistoryError("履歴がありません".to_string()))?
+            .ok_or_else(|| MealPlannerError::HistoryArgumentError("履歴がありません".to_string()))?
     } else if let Some(id) = &args.id {
         storage.load_entry(id)?
     } else {
-        return Err(MealPlannerError::HistoryError(
+        return Err(MealPlannerError::HistoryArgumentError(
             "IDまたは--latestを指定してください".to_string(),
         ));
     };
@@ -468,8 +468,12 @@ fn handle_history_show(
     println!();
 
     // プランデータをJSON形式で表示
-    let json = serde_json::to_string_pretty(&entry.plan)
-        .map_err(|e| MealPlannerError::HistoryError(format!("JSONシリアライズエラー: {}", e)))?;
+    let json = serde_json::to_string_pretty(&entry.plan).map_err(|e| {
+        MealPlannerError::HistorySerializeFailed {
+            context: "プランデータの表示".to_string(),
+            source: e,
+        }
+    })?;
     println!("プランデータ:");
     println!("{}", json);
 

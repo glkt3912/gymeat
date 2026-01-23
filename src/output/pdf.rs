@@ -89,9 +89,7 @@ pub fn write_daily_plan_to_pdf(
 ) -> Result<()> {
     // pandocが利用可能か確認
     if !PdfFormatter::check_pandoc_available() {
-        return Err(MealPlannerError::PdfGenerationError(
-            "pandocコマンドが見つかりません".to_string(),
-        ));
+        return Err(MealPlannerError::PandocNotFound);
     }
 
     // Markdown生成
@@ -100,8 +98,10 @@ pub fn write_daily_plan_to_pdf(
 
     // 一時ファイルに保存
     let temp_md = std::env::temp_dir().join(format!("{}.md", TEMP_FILE_PREFIX));
-    std::fs::write(&temp_md, &markdown)
-        .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
+    std::fs::write(&temp_md, &markdown).map_err(|e| MealPlannerError::FileWriteError {
+        path: temp_md.display().to_string(),
+        source: e,
+    })?;
 
     // pandocでPDF生成
     let output = Command::new("pandoc")
@@ -114,17 +114,16 @@ pub fn write_daily_plan_to_pdf(
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
-        .map_err(|e| MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e)))?;
+        .map_err(|e| MealPlannerError::PandocExecutionFailed { source: e })?;
 
     // 一時ファイル削除
     let _ = std::fs::remove_file(&temp_md);
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(MealPlannerError::PdfGenerationError(format!(
-            "PDF生成失敗: {}",
-            stderr
-        )));
+        return Err(MealPlannerError::PdfGenerationFailed {
+            stderr: stderr.to_string(),
+        });
     }
 
     Ok(())
@@ -139,9 +138,7 @@ pub fn write_weekly_plan_to_pdf(
 ) -> Result<()> {
     // pandocが利用可能か確認
     if !PdfFormatter::check_pandoc_available() {
-        return Err(MealPlannerError::PdfGenerationError(
-            "pandocコマンドが見つかりません".to_string(),
-        ));
+        return Err(MealPlannerError::PandocNotFound);
     }
 
     // Markdown生成
@@ -150,8 +147,10 @@ pub fn write_weekly_plan_to_pdf(
 
     // 一時ファイルに保存
     let temp_md = std::env::temp_dir().join(format!("{}_weekly.md", TEMP_FILE_PREFIX));
-    std::fs::write(&temp_md, &markdown)
-        .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
+    std::fs::write(&temp_md, &markdown).map_err(|e| MealPlannerError::FileWriteError {
+        path: temp_md.display().to_string(),
+        source: e,
+    })?;
 
     // pandocでPDF生成
     let output = Command::new("pandoc")
@@ -164,17 +163,16 @@ pub fn write_weekly_plan_to_pdf(
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
-        .map_err(|e| MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e)))?;
+        .map_err(|e| MealPlannerError::PandocExecutionFailed { source: e })?;
 
     // 一時ファイル削除
     let _ = std::fs::remove_file(&temp_md);
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(MealPlannerError::PdfGenerationError(format!(
-            "PDF生成失敗: {}",
-            stderr
-        )));
+        return Err(MealPlannerError::PdfGenerationFailed {
+            stderr: stderr.to_string(),
+        });
     }
 
     Ok(())
@@ -189,9 +187,7 @@ pub fn write_monthly_plan_to_pdf(
 ) -> Result<()> {
     // pandocが利用可能か確認
     if !PdfFormatter::check_pandoc_available() {
-        return Err(MealPlannerError::PdfGenerationError(
-            "pandocコマンドが見つかりません".to_string(),
-        ));
+        return Err(MealPlannerError::PandocNotFound);
     }
 
     // Markdown生成
@@ -200,8 +196,10 @@ pub fn write_monthly_plan_to_pdf(
 
     // 一時ファイルに保存
     let temp_md = std::env::temp_dir().join(format!("{}_monthly.md", TEMP_FILE_PREFIX));
-    std::fs::write(&temp_md, &markdown)
-        .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
+    std::fs::write(&temp_md, &markdown).map_err(|e| MealPlannerError::FileWriteError {
+        path: temp_md.display().to_string(),
+        source: e,
+    })?;
 
     // pandocでPDF生成
     let output = Command::new("pandoc")
@@ -214,17 +212,16 @@ pub fn write_monthly_plan_to_pdf(
         .arg("-V")
         .arg("geometry:margin=2cm") // マージン設定
         .output()
-        .map_err(|e| MealPlannerError::PdfGenerationError(format!("pandoc実行失敗: {}", e)))?;
+        .map_err(|e| MealPlannerError::PandocExecutionFailed { source: e })?;
 
     // 一時ファイル削除
     let _ = std::fs::remove_file(&temp_md);
 
     if !output.status.success() {
         let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(MealPlannerError::PdfGenerationError(format!(
-            "PDF生成失敗: {}",
-            stderr
-        )));
+        return Err(MealPlannerError::PdfGenerationFailed {
+            stderr: stderr.to_string(),
+        });
     }
 
     Ok(())

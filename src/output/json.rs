@@ -31,7 +31,10 @@ impl OutputFormatter for JsonFormatter {
             serde_json::to_string(&serializable)
         };
 
-        json.map_err(|e| MealPlannerError::FormatError(format!("JSON変換失敗: {}", e)))
+        json.map_err(|e| MealPlannerError::FormatError {
+            context: "日次プランのJSON変換".to_string(),
+            source: e,
+        })
     }
 
     fn format_weekly_plan(
@@ -48,7 +51,10 @@ impl OutputFormatter for JsonFormatter {
             serde_json::to_string(&serializable)
         };
 
-        json.map_err(|e| MealPlannerError::FormatError(format!("JSON変換失敗: {}", e)))
+        json.map_err(|e| MealPlannerError::FormatError {
+            context: "週間プランのJSON変換".to_string(),
+            source: e,
+        })
     }
 
     fn format_monthly_plan(
@@ -65,7 +71,10 @@ impl OutputFormatter for JsonFormatter {
             serde_json::to_string(&serializable)
         };
 
-        json.map_err(|e| MealPlannerError::FormatError(format!("JSON変換失敗: {}", e)))
+        json.map_err(|e| MealPlannerError::FormatError {
+            context: "月間プランのJSON変換".to_string(),
+            source: e,
+        })
     }
 
     fn format_name(&self) -> &'static str {
