@@ -47,6 +47,12 @@ pub enum MealPlannerError {
 
     #[error("無効な日付形式です: {0} (YYYY-MM-DD形式で指定してください)")]
     InvalidDate(String),
+
+    #[error("履歴が見つかりません: {0}")]
+    HistoryNotFound(String),
+
+    #[error("履歴エラー: {0}")]
+    HistoryError(String),
 }
 
 /// Resultのエイリアス型

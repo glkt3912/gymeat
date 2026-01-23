@@ -3,6 +3,7 @@ pub mod cli;
 pub mod config;
 pub mod data;
 pub mod error;
+pub mod history;
 pub mod models;
 pub mod output;
 pub mod planner;
