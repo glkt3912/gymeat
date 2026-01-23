@@ -112,34 +112,34 @@ fn main() -> Result<()> {
                 let formatter = JsonFormatter::new(false);
                 let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ JSON出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::JsonPretty => {
                 let formatter = JsonFormatter::new(true);
                 let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ JSON出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Csv => {
                 let formatter = CsvFormatter::new();
                 let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ CSV出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ CSV出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Markdown => {
                 let formatter = MarkdownFormatter::new();
                 let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
+                if let Some(path) = &args.output_file {
                     println!(
                         "✅ Markdown出力が完了しました: {}",
-                        args.output_file.unwrap()
+                        path
                     );
                 }
             }
@@ -180,34 +180,34 @@ fn main() -> Result<()> {
                 let formatter = JsonFormatter::new(false);
                 let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ JSON出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::JsonPretty => {
                 let formatter = JsonFormatter::new(true);
                 let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ JSON出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Csv => {
                 let formatter = CsvFormatter::new();
                 let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ CSV出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ CSV出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Markdown => {
                 let formatter = MarkdownFormatter::new();
                 let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
+                if let Some(path) = &args.output_file {
                     println!(
                         "✅ Markdown出力が完了しました: {}",
-                        args.output_file.unwrap()
+                        path
                     );
                 }
             }
@@ -248,34 +248,34 @@ fn main() -> Result<()> {
                 let formatter = JsonFormatter::new(false);
                 let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ JSON出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::JsonPretty => {
                 let formatter = JsonFormatter::new(true);
                 let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ JSON出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ JSON出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Csv => {
                 let formatter = CsvFormatter::new();
                 let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
-                    println!("✅ CSV出力が完了しました: {}", args.output_file.unwrap());
+                if let Some(path) = &args.output_file {
+                    println!("✅ CSV出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Markdown => {
                 let formatter = MarkdownFormatter::new();
                 let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
-                if args.output_file.is_some() {
+                if let Some(path) = &args.output_file {
                     println!(
                         "✅ Markdown出力が完了しました: {}",
-                        args.output_file.unwrap()
+                        path
                     );
                 }
             }
