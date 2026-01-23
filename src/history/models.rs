@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 
+use crate::constants::SHORT_ID_LENGTH;
 use crate::models::{DailyPlan, Goal, MonthlyPlan, WeeklyPlan};
 
 /// プランの種類
@@ -102,10 +103,10 @@ impl HistoryEntry {
         }
     }
 
-    /// IDの短縮表示 (先頭8文字)
+    /// IDの短縮表示
     pub fn short_id(&self) -> &str {
-        if self.id.len() >= 8 {
-            &self.id[..8]
+        if self.id.len() >= SHORT_ID_LENGTH {
+            &self.id[..SHORT_ID_LENGTH]
         } else {
             &self.id
         }
@@ -200,10 +201,10 @@ pub struct HistoryIndexEntry {
 }
 
 impl HistoryIndexEntry {
-    /// IDの短縮表示 (先頭8文字)
+    /// IDの短縮表示
     pub fn short_id(&self) -> &str {
-        if self.id.len() >= 8 {
-            &self.id[..8]
+        if self.id.len() >= SHORT_ID_LENGTH {
+            &self.id[..SHORT_ID_LENGTH]
         } else {
             &self.id
         }

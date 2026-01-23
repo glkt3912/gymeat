@@ -1,5 +1,6 @@
 use super::formatter::OutputFormatter;
 use super::markdown::MarkdownFormatter;
+use crate::constants::TEMP_FILE_PREFIX;
 use crate::data::MealDatabase;
 use crate::error::{MealPlannerError, Result};
 use crate::models::{DailyPlan, MonthlyPlan, WeeklyPlan};
@@ -98,7 +99,7 @@ pub fn write_daily_plan_to_pdf(
     let markdown = md_formatter.format_daily_plan(plan, database, show_recipe)?;
 
     // 一時ファイルに保存
-    let temp_md = std::env::temp_dir().join("gymeat_temp.md");
+    let temp_md = std::env::temp_dir().join(format!("{}.md", TEMP_FILE_PREFIX));
     std::fs::write(&temp_md, &markdown)
         .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
 
@@ -148,7 +149,7 @@ pub fn write_weekly_plan_to_pdf(
     let markdown = md_formatter.format_weekly_plan(plan, database, show_recipe)?;
 
     // 一時ファイルに保存
-    let temp_md = std::env::temp_dir().join("gymeat_temp_weekly.md");
+    let temp_md = std::env::temp_dir().join(format!("{}_weekly.md", TEMP_FILE_PREFIX));
     std::fs::write(&temp_md, &markdown)
         .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
 
@@ -198,7 +199,7 @@ pub fn write_monthly_plan_to_pdf(
     let markdown = md_formatter.format_monthly_plan(plan, database, show_recipe)?;
 
     // 一時ファイルに保存
-    let temp_md = std::env::temp_dir().join("gymeat_temp_monthly.md");
+    let temp_md = std::env::temp_dir().join(format!("{}_monthly.md", TEMP_FILE_PREFIX));
     std::fs::write(&temp_md, &markdown)
         .map_err(|e| MealPlannerError::FileWriteError(format!("一時ファイル作成失敗: {}", e)))?;
 

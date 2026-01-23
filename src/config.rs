@@ -1,3 +1,7 @@
+use crate::constants::{
+    DEFAULT_CALORIES_BULK, DEFAULT_CALORIES_CUT, DEFAULT_CALORIES_MAINTAIN, MAX_CALORIES,
+    MAX_HEIGHT_CM, MAX_WEIGHT_KG, MIN_CALORIES, MIN_HEIGHT_CM,
+};
 use crate::error::{MealPlannerError, Result};
 use crate::models::Goal;
 
@@ -61,14 +65,14 @@ impl PlanConfig {
     pub fn validate(&self) -> Result<()> {
         // 体重の検証
         if let Some(w) = self.weight {
-            if w <= 0.0 || w > 300.0 {
+            if w <= 0.0 || w > MAX_WEIGHT_KG as f32 {
                 return Err(MealPlannerError::InvalidWeight(w));
             }
         }
 
         // 身長の検証
         if let Some(h) = self.height {
-            if !(100.0..=250.0).contains(&h) {
+            if !(MIN_HEIGHT_CM as f32..=MAX_HEIGHT_CM as f32).contains(&h) {
                 return Err(MealPlannerError::InvalidHeight(h));
             }
         }
@@ -82,7 +86,7 @@ impl PlanConfig {
 
         // カスタムカロリーの検証
         if let Some(c) = self.custom_calories {
-            if !(500.0..=10000.0).contains(&c) {
+            if !(MIN_CALORIES as f32..=MAX_CALORIES as f32).contains(&c) {
                 return Err(MealPlannerError::InvalidCalories(c));
             }
         }
@@ -111,9 +115,9 @@ impl PlanConfig {
     /// デフォルトのカロリー目標を取得 (体組成情報がない場合)
     pub fn default_calories(&self) -> f32 {
         match self.goal {
-            Goal::Bulk => 2800.0,
-            Goal::Cut => 2000.0,
-            Goal::Maintain => 2400.0,
+            Goal::Bulk => DEFAULT_CALORIES_BULK as f32,
+            Goal::Cut => DEFAULT_CALORIES_CUT as f32,
+            Goal::Maintain => DEFAULT_CALORIES_MAINTAIN as f32,
         }
     }
 }
