@@ -137,10 +137,7 @@ fn main() -> Result<()> {
                 let content = formatter.format_monthly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
                 if let Some(path) = &args.output_file {
-                    println!(
-                        "✅ Markdown出力が完了しました: {}",
-                        path
-                    );
+                    println!("✅ Markdown出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Pdf => {
@@ -205,10 +202,7 @@ fn main() -> Result<()> {
                 let content = formatter.format_weekly_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
                 if let Some(path) = &args.output_file {
-                    println!(
-                        "✅ Markdown出力が完了しました: {}",
-                        path
-                    );
+                    println!("✅ Markdown出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Pdf => {
@@ -273,10 +267,7 @@ fn main() -> Result<()> {
                 let content = formatter.format_daily_plan(&plan, &database, args.recipe)?;
                 write_output(&content, destination)?;
                 if let Some(path) = &args.output_file {
-                    println!(
-                        "✅ Markdown出力が完了しました: {}",
-                        path
-                    );
+                    println!("✅ Markdown出力が完了しました: {}", path);
                 }
             }
             OutputFormatArg::Pdf => {
