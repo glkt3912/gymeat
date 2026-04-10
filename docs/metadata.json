@@ -1,0 +1,14 @@
+{
+  "documents": [
+    {
+      "id": "calculation-logic",
+      "path": "docs/calculation-logic.md",
+      "title": "カロリー・栄養素計算ロジック仕様",
+      "description": "Harris-Benedict式によるBMR/TDEE計算、目的別カロリー調整、マクロ栄養素配分のロジックを詳細に説明する仕様書",
+      "tags": ["calorie", "nutrition", "BMR", "TDEE", "Harris-Benedict", "カロリー計算", "栄養素", "マクロ"],
+      "industry": ["fitness", "health"],
+      "topics": ["calculator", "nutrition", "algorithm", "specification"],
+      "updatedAt": "2026-04-10"
+    }
+  ]
+}
