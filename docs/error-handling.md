@@ -37,7 +37,6 @@
 | バリアント | エラーメッセージ |
 |---|---|
 | `OutputError(String)` | 出力エラー: {0} |
-| `FileWriteError { path, source }` | ファイル書き込みエラー: {path} |
 | `FormatError { context, source }` | フォーマット変換エラー: {context} |
 
 ### PDF生成エラー（終了コード 4）
@@ -53,12 +52,17 @@
 | バリアント | 説明 |
 |---|---|
 | `IoError(std::io::Error)` | 汎用I/Oエラー（`#[from]` による自動変換）|
+| `FileWriteError { path, source }` | ファイル書き込み失敗 |
+| `HistoryReadFailed { path, source }` | 履歴ファイル読み込み失敗 |
+| `HistoryWriteFailed { path, source }` | 履歴ファイル保存失敗 |
+| `HistoryDeleteFailed { path, source }` | 履歴ファイル削除失敗 |
+| `HistoryDirCreationFailed { path, source }` | 履歴ディレクトリ作成失敗 |
+
+### その他エラー（終了コード 1）
+
+| バリアント | 説明 |
+|---|---|
 | `JsonError(serde_json::Error)` | JSONエラー（`#[from]` による自動変換）|
-| `FileWriteError { path, source }` | ファイル書き込み失敗（終了コード3） |
-| `HistoryReadFailed { path, source }` | 履歴ファイル読み込み失敗（終了コード3） |
-| `HistoryWriteFailed { path, source }` | 履歴ファイル保存失敗（終了コード3） |
-| `HistoryDeleteFailed { path, source }` | 履歴ファイル削除失敗（終了コード3） |
-| `HistoryDirCreationFailed { path, source }` | 履歴ディレクトリ作成失敗（終了コード3） |
 
 ### 履歴エラー（終了コード 5）
 
