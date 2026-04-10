@@ -9,6 +9,56 @@
       "industry": ["fitness", "health"],
       "topics": ["calculator", "nutrition", "algorithm", "specification"],
       "updatedAt": "2026-04-10"
+    },
+    {
+      "id": "planner-logic",
+      "path": "docs/planner-logic.md",
+      "title": "プランナーロジック仕様",
+      "description": "日次・週次・月次プランの生成アルゴリズム、カロリー配分比率（朝23%/昼33%/夕34%/間食10%）、デデュプリケーション戦略、フォールバック処理",
+      "tags": ["planner", "algorithm", "deduplication", "daily", "weekly", "monthly", "プランナー", "重複回避"],
+      "industry": ["fitness", "health"],
+      "topics": ["planner", "algorithm", "meal-selection", "specification"],
+      "updatedAt": "2026-04-10"
+    },
+    {
+      "id": "meal-database",
+      "path": "docs/meal-database.md",
+      "title": "メニューデータベース仕様",
+      "description": "24種類の組み込みメニュー一覧（朝食6・昼食7・夕食7・間食4）、Meal/Nutrition/MealTypeのデータ構造、MealDatabaseのAPIリファレンス",
+      "tags": ["meal", "database", "menu", "nutrition", "recipe", "メニュー", "食事", "レシピ"],
+      "industry": ["fitness", "health"],
+      "topics": ["database", "meal", "data-structure", "reference"],
+      "updatedAt": "2026-04-10"
+    },
+    {
+      "id": "output-formats",
+      "path": "docs/output-formats.md",
+      "title": "出力フォーマット仕様",
+      "description": "terminal/json/json-pretty/csv/markdown/pdf の各フォーマット仕様、出力先（stdout/ファイル）、OutputFormatter trait、pandoc依存",
+      "tags": ["output", "format", "json", "csv", "markdown", "pdf", "terminal", "出力", "フォーマット"],
+      "industry": ["fitness", "health"],
+      "topics": ["output", "format", "pdf", "csv", "specification"],
+      "updatedAt": "2026-04-10"
+    },
+    {
+      "id": "history-management",
+      "path": "docs/history-management.md",
+      "title": "履歴管理仕様",
+      "description": "履歴の保存パス（~/.gymeat/history/）、インデックス構造、UUID/短縮IDによる検索、フィルタ仕様（goal/plan-type/last）",
+      "tags": ["history", "storage", "UUID", "index", "filter", "履歴", "保存", "検索"],
+      "industry": ["fitness", "health"],
+      "topics": ["history", "storage", "file-system", "specification"],
+      "updatedAt": "2026-04-10"
+    },
+    {
+      "id": "error-handling",
+      "path": "docs/error-handling.md",
+      "title": "エラーハンドリング仕様",
+      "description": "MealPlannerErrorの全バリアント一覧、終了コード対応表（2:バリデーション/3:IO/4:PDF/5:履歴）、バリデーション許容範囲",
+      "tags": ["error", "exit-code", "validation", "thiserror", "エラー", "終了コード", "バリデーション"],
+      "industry": ["fitness", "health"],
+      "topics": ["error-handling", "validation", "exit-code", "specification"],
+      "updatedAt": "2026-04-10"
     }
   ]
 }
